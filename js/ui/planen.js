@@ -57,7 +57,7 @@ route('planen', async () => {
   }
   const st = { see: seen.length > 1 ? 'alle' : seen[0].id, wann: 'tn', modus: 'zeitraum' };
   const tage = Array.from({ length: 10 }, (_, i) => { const d = new Date(heute0().getTime() + i * DAY + 2 * HOUR); d.setHours(0, 0, 0, 0); return d; });
-  let gewaehlt = tage.slice(0, 4).map(iso);
+  let gewaehlt = tage.slice(0, 5).map(iso);
   const tagChips = chips(tage.map(d => [iso(d), kurz(d)]), gewaehlt, { mehrfach: true, grau: true, raster: true, onchange: v => {
     if (st.modus === 'tag') { const neu = v.filter(x => !gewaehlt.includes(x)); gewaehlt = neu.length ? [neu[0]] : v.slice(0, 1); tagChips.setze(gewaehlt); } else gewaehlt = v;
   } });
@@ -100,10 +100,12 @@ route('planergebnis', async param => {
     const kaltStabil = alle.filter(x => x.b.kaltStabil).length >= alle.length * 0.6;
     const mildNass = alle.filter(x => x.b.mildNass).length >= alle.length * 0.5;
     const umschwung = alle.find(x => x.b.umschwung);
-    let lage = kaltStabil ? 'Es bleibt überwiegend kalt und stabil. In so einer Phase läuft tiefes Wasser besser als ein flacher Weiher.'
-      : mildNass ? 'Mild und feucht: Ein flacher Weiher reagiert darauf schneller und stärker als ein tiefer Baggersee.'
-        : 'Wechselnde Lage – die Sterne zeigen, wo und wann es am besten passt.';
-    if (umschwung) lage = 'Umschwung von kalt-klar zu mild-trüb am ' + lang(umschwung.tag) + ' – das ist eine Top-Beißphase. ' + lage;
+    const warum = best.b.gruende.slice(0, 3).join(', ');
+    let lage = (best.b.umschwung ? 'Umschwung von kalt-klar zu mild-trüb – das ist eine Top-Beißphase' : 'Am ' + TAGE[best.tag.getDay()] + ': ' + (warum || 'keine starken Signale')) + '. ';
+    if (kaltStabil && !best.b.kaltStabil) lage += 'Die übrigen Tage sind überwiegend kalt und stabil – dann läuft tiefes Wasser besser als ein flacher Weiher.';
+    else if (kaltStabil) lage += 'Die Phase bleibt kalt und stabil – tiefes Wasser läuft dann besser als ein flacher Weiher.';
+    else if (mildNass) lage += 'Mild und feucht: Ein flacher Weiher reagiert darauf schneller und stärker als ein tiefer Baggersee.';
+    else if (umschwung && umschwung !== best) lage += 'Achtung: Umschwung kalt-klar → mild-trüb am ' + lang(umschwung.tag) + '.';
     const quellen = [...new Set(erg.map(r => r.quelle).filter(Boolean))].join(', ');
     const zeilen = tage.map(tag => {
       const jeSee = erg.map(r => Object.assign({ lake: r.lake }, r.tage.find(x => x.tag.getTime() === tag.getTime())));

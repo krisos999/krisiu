@@ -41,8 +41,8 @@ route('start', async () => {
   if (!lauf) krisiuFrage().then(f => {
     if (!f) return;
     frageBox.replaceChildren(h('div', { class: 'hinweis' }, h('div', { class: 'kopfzeile' }, k(22), 'Krisiu fragt'), h('p', { style: 'margin:0' }, f.text),
-      h('div', { class: 'zwei' }, h('button', { class: 'btn rot', type: 'button', style: 'height:48px;font-size:18px', onclick: f.planen }, 'Ansitz planen'),
-        h('button', { class: 'btn neutral', type: 'button', style: 'height:48px;font-size:16px', onclick: async () => { await f.keineZeit(); frageBox.hidden = true; } }, 'Keine Zeit diese Woche'))));
+      h('div', { class: 'block eng' }, h('button', { class: 'btn rot', type: 'button', style: 'height:48px;font-size:18px', onclick: f.planen }, 'Ansitz planen'),
+        h('button', { class: 'btn neutral', type: 'button', style: 'height:44px;font-size:15px', onclick: async () => { await f.keineZeit(); frageBox.hidden = true; } }, 'Keine Zeit diese Woche'))));
     frageBox.hidden = false;
   });
   return seite([
