@@ -10,6 +10,7 @@ import { APP_NAME, APP_VERSION } from '../core/version.js';
 import { h, icon, route, go, seite, kopf, lbl, k, krisiuTab, chips, toast, sicher, uhrzeit, datumKurz, datumLang, dauer, zahl } from './app.js';
 import { jetzt, alleSeen, laufenderAnsitz, beendeteAnsitze, zahlen, wetterJetzt, krisiuLage, krisiuHinweise, STIMMUNG } from './daten.js';
 import { mountDiagnose } from './diagnose.js';
+import { krisiuFrage } from './planen.js';
 
 const krisiuZeile = lage => {
   const [emo, , farbe] = STIMMUNG[lage.art] || ['🙂', '', ''];
@@ -36,14 +37,23 @@ route('start', async () => {
     go('gewaesser');
   };
   const d = new Date();
+  const frageBox = h('div', { class: 'block', hidden: true });
+  if (!lauf) krisiuFrage().then(f => {
+    if (!f) return;
+    frageBox.replaceChildren(h('div', { class: 'hinweis' }, h('div', { class: 'kopfzeile' }, k(22), 'Krisiu fragt'), h('p', { style: 'margin:0' }, f.text),
+      h('div', { class: 'zwei' }, h('button', { class: 'btn rot', type: 'button', style: 'height:48px;font-size:18px', onclick: f.planen }, 'Ansitz planen'),
+        h('button', { class: 'btn neutral', type: 'button', style: 'height:48px;font-size:16px', onclick: async () => { await f.keineZeit(); frageBox.hidden = true; } }, 'Keine Zeit diese Woche'))));
+    frageBox.hidden = false;
+  });
   return seite([
     krisiuTab(STIMMUNG[lage.art] ? STIMMUNG[lage.art][0] : null),
     h('div', { class: 'block', style: 'gap:14px' }, h('p', { class: 'datum', style: 'margin:0' }, datumLang(d) + ' · ' + uhrzeit(d) + ' Uhr'), krisiuZeile(lage)),
     h('h1', { class: 'gross' }, lauf ? 'Du bist am Wasser.' : 'Bist du am Wasser?'),
     h('div', { class: 'block', style: 'gap:12px' },
       h('button', { class: 'btn rot hero', type: 'button', onclick: starten }, lauf ? 'Zum Ansitz' : 'Angeln starten'),
-      h('button', { class: 'btn neutral', type: 'button', style: 'height:64px', onclick: () => toast('Ansitz planen kommt mit der nächsten Version: Sterne für die nächsten Tage aus der Vorhersage.', { ms: 4200 }) },
+      h('button', { class: 'btn neutral', type: 'button', style: 'height:64px', onclick: () => go('planen') },
         k(28), 'Ansitz planen')),
+    frageBox,
     h('div', { class: 'block', style: 'gap:10px' }, letzteKarte,
       h('div', { style: 'display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px' },
         h('button', { class: 'btn neutral', type: 'button', style: 'height:48px;font-size:16px', onclick: () => go('logbuch') }, 'Logbuch'),
@@ -121,6 +131,10 @@ route('logbuch', async filter => {
     h('div', { class: 'block', style: 'gap:16px' }, kopf({ zurueck: 'start', pille: liste.length + (liste.length === 1 ? ' Ansitz' : ' Ansitze') }), h('h1', {}, 'Logbuch')),
     seen.length > 1 ? box : null,
     h('div', { class: 'liste' }, ...(zeilen.length ? zeilen : [h('div', { class: 'leer' }, 'Noch kein Ansitz gespeichert. Starte einen oder trag einen nach.')])),
+    h('div', { class: 'liste' },
+      h('button', { class: 'zeile', type: 'button', onclick: () => go('rekorde', wahl === 'alle' ? null : wahl) }, 'Rekorde', h('span', { class: 'rechts' }, icon('pfeil'))),
+      h('button', { class: 'zeile', type: 'button', onclick: () => go('fische', wahl === 'alle' ? null : wahl) }, 'Deine Fische', h('span', { class: 'rechts' }, 'Steckbriefe', icon('pfeil'))),
+      h('button', { class: 'zeile', type: 'button', onclick: () => go('bisskarte', wahl === 'alle' ? null : wahl) }, 'Biss-Karte', h('span', { class: 'rechts' }, icon('pfeil')))),
     h('button', { class: 'btn neutral', type: 'button', onclick: () => go('nachtragen') }, 'Ansitz nachtragen')
   ]);
 });
@@ -150,35 +164,6 @@ route('nachtragen', async () => {
 });
 
 /* ---------- 5 · Auswertung eines Ansitzes ---------- */
-route('auswertung', async id => {
-  const s = id ? await sessions.get(id) : (await beendeteAnsitze())[0];
-  if (!s) { go('logbuch'); return h('div'); }
-  const lake = await lakes.get(s.lakeId);
-  const z = await zahlen(s);
-  const w = s.weather;
-  const wx = w ? h('div', { class: 'karte' }, lbl('Wetter im Ansitz' + (w.provisional ? ' · vorläufig' : '')),
-    zeile('Luft', zahl(w.tempMinC) + ' bis ' + zahl(w.tempMaxC) + ' °C'),
-    zeile('Luftdruck', zahl(w.pressureStartHpa, 0) + ' → ' + zahl(w.pressureEndHpa, 0) + ' hPa' + (w.pressureMinHpa != null ? ' · Tief ' + zahl(w.pressureMinHpa, 0) : '')),
-    zeile('Wind', (w.windDir || '–') + (w.windKmh != null ? ' · ' + zahl(w.windKmh, 0) + ' km/h' : '') + (w.gustKmh != null ? ' · Böen ' + zahl(w.gustKmh, 0) : '')),
-    zeile('Wolken · Regen', (w.cloudPct != null ? w.cloudPct + ' %' : '–') + ' · ' + (w.precipMm != null ? zahl(w.precipMm) + ' mm' : '–')),
-    h('span', { class: 'klein' }, 'Quelle: ' + (w.source || 'Wetterdienst')))
-    : h('div', { class: 'leer' }, s.endTs == null ? 'Das Wetter für den ganzen Ansitz kommt nach dem Beenden.' : (lake && lake.lat == null ? 'Das Gewässer hat keine Koordinaten – kein Wetter.' : 'Das Wetter wird geholt, sobald Netz da ist.'));
-  const liste = z.eintraege.map(e => h('div', { class: 'eintrag', style: 'cursor:default' },
-    h('span', { class: 'text' }, h('span', { class: 'titel' }, e.time.slice(11) + ' · ' + ({ fang: e.species || 'Fang', fehlbiss: 'Fehlbiss', verloren: 'Verloren', beobachtung: e.kind || 'Beobachtung' }[e.type])),
-      h('span', { class: 'info' }, [e.rod, e.bait, e.spotName, e.weather && e.weather.pressureHpa != null ? zahl(e.weather.pressureHpa, 0) + ' hPa' + (e.weather.pressure3h != null ? ' (' + zahl(e.weather.pressure3h) + ' in 3 h)' : '') : null, e.ctx && e.ctx.dayPhase].filter(Boolean).join(' · ') || ' ')),
-    h('span', { class: 'zahl' }, e.weightKg ? zahl(e.weightKg) + ' kg' : '')));
-  return seite([
-    h('div', { class: 'block', style: 'gap:16px' }, kopf({ zurueck: 'logbuch', text: 'Logbuch', pille: (lake ? lake.short : '') + ' · ' + datumKurz(new Date(s.startTs)) }), h('h1', {}, 'Auswertung')),
-    h('div', { class: 'kacheln' },
-      h('div', { class: 'kachel' }, h('span', { class: 'lbl' }, 'Fische'), h('b', {}, String(z.fische)), h('small', {}, z.bisse + ' Bisse')),
-      h('div', { class: 'kachel' }, h('span', { class: 'lbl' }, 'Dauer'), h('b', {}, dauer((s.endTs || Date.now()) - s.startTs)), h('small', {}, s.timed ? s.start.slice(11) + (s.end ? '–' + s.end.slice(11) : '') : 'ohne Uhrzeit')),
-      h('div', { class: 'kachel' }, h('span', { class: 'lbl' }, 'Futter'), h('b', {}, zahl(z.futterKg) + ' kg'), h('small', {}, (s.feedings || []).length + '× gefüttert'))),
-    wx,
-    h('div', { class: 'block' }, lbl('Bisse und Fänge'), h('div', { class: 'liste' }, ...(liste.length ? liste : [h('div', { class: 'leer' }, s.timed ? 'In diesem Ansitz ist nichts eingetragen.' : 'Für diesen Ansitz stehen keine Uhrzeiten zur Verfügung.')]))),
-    s.notes ? h('div', { class: 'karte' }, lbl('Notiz'), h('span', {}, s.notes)) : null,
-    h('p', { class: 'klein' }, 'Mehr Auswertung (Bisse nach Wetter, Köder, Uhrzeit) kommt, sobald genug Bisse da sind.')
-  ]);
-});
 const zeile = (a, b) => h('div', { class: 'reihe', style: 'justify-content:space-between' }, h('span', { class: 'klein', style: 'font-size:14px' }, a), h('span', { style: 'font-weight:600;text-align:right' }, b));
 
 /* ---------- 6 · Krisiu ---------- */

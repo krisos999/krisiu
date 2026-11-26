@@ -22,7 +22,7 @@ const pfad = pts => 'M' + pts.map(p => r1(p[0]) + ' ' + r1(p[1])).join('L') + 'Z
 const schrift = (gr, extra = {}) => Object.assign({ fill: BONE, stroke: '#000', 'stroke-width': 3, 'paint-order': 'stroke', 'font-family': 'Barlow, system-ui, sans-serif', 'font-size': gr, 'font-weight': 600 }, extra);
 
 /** Zeichnet Luftbild/Kontur, Linien und Spots einer Karte in ein SVG. Marker werden in Bildschirm-Pixeln gezeichnet. */
-export function grundkarte(map, sc, { luft = true, spots = [], breite = map.w * sc } = {}) {
+export function grundkarte(map, sc, { luft = true, spots = [], breite = map.w * sc, x0 = 0 } = {}) {
   const k = 1 / sc;
   const teile = [luft ? sv('image', { href: map.image, x: 0, y: 0, width: map.w, height: map.h, preserveAspectRatio: 'none' })
     : sv('rect', { x: 0, y: 0, width: map.w, height: map.h, fill: '#0b0d0c' })];
@@ -51,7 +51,7 @@ export function grundkarte(map, sc, { luft = true, spots = [], breite = map.w * 
         sp.depthText ? sv('text', schrift(10, { y: dy + 12, 'text-anchor': 'middle', 'font-weight': 400, 'fill-opacity': 0.75 }), sp.depthText) : null));
       return;
     }
-    const rechtsPlatz = px + 9 + bw < breite;
+    const rechtsPlatz = px - x0 * sc + 9 + bw < breite;
     const lagen = [[9, 4, 'start'], [-9, 4, 'end'], [9, 18, 'start'], [-9, -8, 'end'], [9, -8, 'start'], [-9, 18, 'end']]
       .sort((a, b) => (rechtsPlatz ? 0 : (a[2] === 'start') - (b[2] === 'start')));
     const box = ([dx, dy, an]) => ({ x: an === 'start' ? px + dx : px + dx - bw, y: py + dy - 11, w: bw, h: 14 });

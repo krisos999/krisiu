@@ -8,6 +8,9 @@ import { show, toast } from './ui/app.js';
 import './ui/start.js';
 import './ui/ansitz.js';
 import './ui/karte.js';
+import './ui/auswertung.js';
+import './ui/fische.js';
+import './ui/planen.js';
 
 async function start() {
   const root = document.getElementById('app');

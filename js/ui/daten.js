@@ -1,7 +1,7 @@
 // Daten für die Oberfläche: laufender Ansitz, Wetter jetzt, Chancen nach Faustregeln, Krisius Stimmung.
 
 import { lakes, sessions, entries, settings, entriesOfSession } from '../core/repo.js';
-import { fetchPoint } from '../core/weather.js';
+import { fetchPoint, loadHours } from '../core/weather.js';
 import { sunTimes } from '../core/astro.js';
 import { toLocalIso, isNum, DAY, HOUR } from '../core/util.js';
 
@@ -138,4 +138,22 @@ export async function krisiuHinweise(s, lake, wx) {
     else if (!z.bisse && ohne >= 6) out.push({ art: 'unruhig', text: 'Sechs Stunden ruhig. Neu legen?', grund: 'dein Ansitz' });
   }
   return out;
+}
+
+/* ---------- Stundenwerte für Auswertung und Planung (vergangene Zeiträume bleiben auf dem Gerät) ---------- */
+export async function stundenFuer(lake, fromMs, toMs, { merken = true } = {}) {
+  if (!lake || !isNum(lake.lat)) return { hours: [], grund: 'ohne-ort' };
+  const key = 'std:' + lake.id + ':' + Math.floor(fromMs / HOUR) + ':' + Math.ceil(toMs / HOUR);
+  const alt = await settings.get(key);
+  if (alt && (alt.fertig || Date.now() - alt.at < 30 * 60000)) return alt.data;
+  if (navigator.onLine === false) return alt ? alt.data : { hours: [], grund: 'offline' };
+  try {
+    const d = await loadHours(lake.lat, lake.lon, fromMs, toMs);
+    const data = { hours: d.hours.map(x => ({ t: x.t, tempC: x.tempC, pressureHpa: x.pressureHpa, windKmh: x.windKmh, gustKmh: x.gustKmh, windDeg: x.windDeg, cloudPct: x.cloudPct, precipMm: x.precipMm, measured: x.measured })), quelle: d.provider };
+    const fertig = toMs < Date.now() - 6 * HOUR && data.hours.every(x => x.measured);
+    if (merken) await settings.set(key, { at: Date.now(), fertig, data });
+    return data;
+  } catch (err) {
+    return alt ? alt.data : { hours: [], grund: 'fehler', fehler: err.message };
+  }
 }

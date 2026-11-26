@@ -85,6 +85,8 @@ export const lakes = makeRepo('lakes', 'l', async lake => {
   if ((lake.lat == null) !== (lake.lon == null)) fail('Bitte Breite und Länge beide angeben oder beide leer lassen.', 'lat');
   lake.elevationM = optNumber(lake.elevationM, 'elevationM', -430, 5000, 'Höhe');
   lake.note = text(lake.note);
+  lake.art = ['weiher', 'baggersee', 'fluss'].includes(lake.art) ? lake.art : null;
+  if (lake.tipps && typeof lake.tipps !== 'object') lake.tipps = null;
   return lake;
 });
 
@@ -131,6 +133,15 @@ export const maps = makeRepo('maps', 'm', async map => {
   map.source = text(map.source); map.legend = text(map.legend); map.geoNote = text(map.geoNote);
   delete map.labels;
   return map;
+});
+
+/* ---------- Fische mit Steckbrief ---------- */
+export const fish = makeRepo('fish', 'f', async f => {
+  await requireLake(f.lakeId);
+  f.species = text(f.species) || fail('Bitte die Fischart angeben.', 'species');
+  f.name = text(f.name);
+  f.merkmale = (Array.isArray(f.merkmale) ? f.merkmale : []).map(text).filter(Boolean).slice(0, 12);
+  return f;
 });
 
 /** Karte eines Gewässers oder null. */
@@ -181,7 +192,7 @@ export const entries = makeRepo('entries', 'e', async (e, existing) => {
   e.depthM = optNumber(e.depthM, 'depthM', 0, 100, 'Tiefe');
   e.waterTempC = optNumber(e.waterTempC, 'waterTempC', -1, 40, 'Wassertemperatur');
   e.pressureOwnHpa = optNumber(e.pressureOwnHpa, 'pressureOwnHpa', 850, 1090, 'Luftdruck');
-  ['spotId', 'spotName', 'rod', 'bait', 'rig', 'feed', 'notes', 'kind', 'sessionId'].forEach(k => { e[k] = text(e[k]); });
+  ['spotId', 'spotName', 'rod', 'bait', 'rig', 'feed', 'notes', 'kind', 'sessionId', 'fishId'].forEach(k => { e[k] = text(e[k]); });
   if (e.type === 'beobachtung' && !e.kind && !e.notes) fail('Bitte angeben, was du gesehen hast.', 'kind');
   if (e.pos && !(isNum(e.pos.lat) && isNum(e.pos.lon))) e.pos = null;
 

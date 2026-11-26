@@ -29,11 +29,16 @@ const MIGRATIONS = [
     // Karten der Gewässer (Luftbild, Uferlinie, Tiefenlinien). Kommen aus der privaten Startdatei.
     const maps = db.createObjectStore('maps', { keyPath: 'id' });
     maps.createIndex('lakeId', 'lakeId');
+  },
+  function v3(db) {
+    // Einzelne Fische mit Steckbrief (Name, Erkennungszeichen); Fänge verweisen per fishId darauf.
+    const fish = db.createObjectStore('fish', { keyPath: 'id' });
+    fish.createIndex('lakeId', 'lakeId');
   }
 ];
 
 export const DB_VERSION = MIGRATIONS.length;
-export const DATA_STORES = ['lakes', 'spots', 'sessions', 'entries', 'maps'];
+export const DATA_STORES = ['lakes', 'spots', 'sessions', 'entries', 'maps', 'fish'];
 export const ALL_STORES = [...DATA_STORES, 'photos', 'meta'];
 
 let dbPromise = null;

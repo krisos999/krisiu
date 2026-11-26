@@ -25,9 +25,9 @@ export async function importStart(d) {
       if (lake) {
         // Name und Kürzel des Anglers bleiben; die Lage aus der Startdatei ist genauer (aus dem Luftbild).
         lageNeu = L.lat != null && (Math.abs((lake.lat || 0) - L.lat) > 0.001 || Math.abs((lake.lon || 0) - L.lon) > 0.001);
-        lake = await lakes.save({ id: lake.id, lat: L.lat != null ? L.lat : lake.lat, lon: L.lon != null ? L.lon : lake.lon, note: lake.note || L.note || null });
+        lake = await lakes.save({ id: lake.id, lat: L.lat != null ? L.lat : lake.lat, lon: L.lon != null ? L.lon : lake.lon, note: lake.note || L.note || null, art: L.art || lake.art || null, tipps: L.tipps || lake.tipps || null });
       } else {
-        lake = await lakes.save({ name: L.name, short: L.short, lat: L.lat, lon: L.lon, note: L.note || null });
+        lake = await lakes.save({ name: L.name, short: L.short, lat: L.lat, lon: L.lon, note: L.note || null, art: L.art || null, tipps: L.tipps || null });
         bestand.push(lake);
       }
       let karte = false;

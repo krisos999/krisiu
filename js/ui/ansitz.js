@@ -105,8 +105,7 @@ route('fang', async () => {
     if (!e) return;
     if (datei) await sicher(() => savePhoto(e.id, datei));
     syncWeather();
-    toast('🎉 Sauber! ' + e.species + (e.weightKg ? ' ' + zahl(e.weightKg) + ' kg' : '') + ' gespeichert. Schon den Kollegen Bescheid gesagt?', { ms: 4200 });
-    go('ansitz');
+    go('fangkarte', e.id);
   };
 
   return seite([
@@ -210,7 +209,7 @@ route('rute', async nr => {
   const { s } = a;
   const ruten = rutenVon(s);
   const r = Object.assign({}, ruten.find(x => String(x.nr) === String(nr)) || { nr: Number(nr) || 1 });
-  const spot = h('input', { class: 'feld', placeholder: 'z. B. Fangzone West', value: r.spot || '' });
+  const spot = h('input', { class: 'feld', placeholder: 'z. B. Kante links', value: r.spot || '' });
   const weite = h('input', { class: 'feld', inputmode: 'numeric', placeholder: 'm', value: r.entfernungM || '', style: 'width:110px;flex:none' });
   const koeder = chips(KOEDER, r.koeder || [], { mehrfach: true });
   const montage = h('input', { class: 'feld', placeholder: 'z. B. Ronnie Rig, 20 cm', value: r.montage || '' });

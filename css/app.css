@@ -150,3 +150,45 @@ input, select, textarea { font: inherit; color: var(--ink); background: var(--s1
 .chips.scrollreihe { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
 .chips.scrollreihe::-webkit-scrollbar { display: none; }
 .chips.scrollreihe .chip { flex: none; height: 40px; font-size: 16px; }
+
+/* ---------- Auswertung ---------- */
+.muster { gap: 10px; }
+.gross2 { font: 700 30px/1.02 var(--cond); text-transform: uppercase; letter-spacing: .01em; }
+.faktoren { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.faktor .wert { font: 700 19px/1.1 var(--cond); text-transform: uppercase; letter-spacing: .02em; }
+.faktor.stark { border-color: var(--green); }
+.diagramm { display: flex; flex-direction: column; gap: 6px; padding: 10px 6px 8px; border-radius: 12px; background: var(--s1); border: 1px solid var(--line); }
+.diagramm svg { display: block; cursor: pointer; }
+.paare { display: flex; flex-direction: column; gap: 8px; }
+.paar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.paar > div { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--s2); border: 1px solid var(--line); font-size: 14px; }
+.paar b { font: 700 24px/1 var(--cond); }
+.paar .eins b { color: var(--green); }
+.balkenliste { display: flex; flex-direction: column; gap: 8px; }
+.balkenzeile { display: grid; grid-template-columns: minmax(0, 9em) 1fr 2em; gap: 10px; align-items: center; font-size: 14px; }
+.balkenzeile .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.balkenzeile .spur { height: 12px; border-radius: 6px; background: var(--s2); overflow: hidden; }
+.balkenzeile .fuell { display: block; height: 100%; border-radius: 6px; background: var(--red); }
+.balkenzeile b { font: 700 18px/1 var(--cond); text-align: right; }
+.rute .rnr { font: 700 20px/1 var(--cond); text-transform: uppercase; }
+.kontext-titel { font: 700 20px/1.1 var(--cond); text-transform: uppercase; }
+.klein-chips .chip { height: 38px; font-size: 15px; padding: 0 13px; }
+.bisskarte { display: block; }
+
+/* ---------- Fangkarte, Steckbrief, Wiederfang ---------- */
+.fangkarte { border-radius: 14px; overflow: hidden; background: var(--s2); border: 1px solid var(--line); }
+.fangfoto { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--s1); }
+.leerfoto { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 14px; background: var(--s1); }
+.fangkarte .art { font: 700 30px/1 var(--cond); text-transform: uppercase; }
+.fangkarte .gewicht { font: 700 30px/1 var(--cond); color: var(--green); white-space: nowrap; }
+.mini { width: 52px; height: 52px; flex: none; border-radius: 10px; object-fit: cover; font-size: 10px; text-align: center; }
+.vergleich { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.vfoto { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; font-size: 12px; }
+.merkmal { padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+
+/* ---------- Planen ---------- */
+.chips.raster.fuenf { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.chips.raster.fuenf .chip { font-size: 15px; height: 44px; }
+.sterne.gross { font-size: 24px; }
+.bester { border-color: var(--green); gap: 10px; }
+.plantag .sterne { flex: none; }

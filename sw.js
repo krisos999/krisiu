@@ -2,7 +2,7 @@
 // Bei jeder Veröffentlichung VERSION erhöhen (gleich wie APP_VERSION in js/core/version.js)
 // und neue Dateien in SHELL eintragen. Sonst bekommen installierte Geräte die Änderung nicht.
 
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const CACHE = 'fangbuch-' + VERSION;
 const FONTS = 'schrift-1';
 const SHELL = [
@@ -30,6 +30,11 @@ const SHELL = [
   './js/ui/start.js',
   './js/ui/ansitz.js',
   './js/ui/karte.js',
+  './js/ui/analyse.js',
+  './js/ui/diagramm.js',
+  './js/ui/auswertung.js',
+  './js/ui/fische.js',
+  './js/ui/planen.js',
   './js/ui/diagnose.js',
   './icons/icon-192.png',
   './icons/icon-512.png',

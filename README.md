@@ -1,9 +1,9 @@
-# Krisiu – installierbare Web-App (Version 0.2.0)
+# Krisiu – installierbare Web-App (Version 0.4.0)
 
 Fangbuch für Angler: Fänge, Bisse, Beobachtungen und Ansitze mit Zeit, Sonne, Mond und Wetter.
 Jeder Nutzer hat sein eigenes Fangbuch; alle Daten liegen nur auf seinem Gerät.
 
-**Stand 0.2.0:** Oberfläche nach dem Design-Entwurf „Krisiu – App-Entwurf“: Start, Gewässer, Ansitz mit Wetter und Chancen nach Faustregeln, Fang mit Foto, Fehlbiss, Sprechen (Diktier-Mikro), Ruten und Plätze, Futter, Beenden, Auswertung, Logbuch, Nachtragen, Krisiu mit festen Regeln, Sicherung. Der alte Technik-Test liegt unter „Mehr → Technik-Test“. Alles kostenlos, ohne Server; Daten nur auf dem Gerät.
+**Stand 0.4.0:** Start, Gewässer, Ansitz mit Wetter und Chancen, Fang mit Foto und Fangkarte, Fehlbiss, Sprechen, Ruten und Plätze, **Karte** (Luftbild, Köder-Spot und Angelplatz antippen, Entfernung), Futter, Beenden, **Auswertung** (Muster, Wetterverlauf, Erweitert, Kontext, Biss-Karte), **Rekorde**, **Fische mit Steckbrief und Wiederfang**, **Ansitz planen** (Sterne aus der Vorhersage), Logbuch, Nachtragen, Krisiu mit festen Regeln, Sicherung. Alles kostenlos, ohne Server; Daten nur auf dem Gerät. Gewässer, Karten, Spots und Platz-Tipps kommen über eine **private Startdatei** (Mehr → einlesen) und stehen nicht im Programm.
 
 ## Aufbau
 
