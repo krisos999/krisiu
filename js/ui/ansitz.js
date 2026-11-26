@@ -1,6 +1,6 @@
 // Am Wasser: Ansitz läuft, Fang, Fehlbiss, Sprechen, Ruten und Plätze, Rute einrichten, Futter, Beenden.
 
-import { lakes, sessions, entries } from '../core/repo.js';
+import { lakes, sessions, entries, mapOf } from '../core/repo.js';
 import { savePhoto } from '../core/photos.js';
 import { syncWeather } from '../core/weather-sync.js';
 import { h, icon, route, go, seite, kopf, lbl, k, krisiuTab, chips, toast, sicher, uhrzeit, datumKurz, dauer, zahl } from './app.js';
@@ -99,7 +99,8 @@ route('fang', async () => {
     const r = ruten.find(x => x.nr === rute) || {};
     const e = await sicher(() => entries.save({
       lakeId: s.lakeId, sessionId: s.id, type: 'fang', species: spezies, weightKg: gewicht.value, time: jetzt().slice(0, 11) + zeit.value,
-      rod: rute ? 'Rute ' + rute : null, bait: (r.koeder || []).join(' + ') || null, spotName: r.spot || null, rig: r.montage || null
+      rod: rute ? 'Rute ' + rute : null, bait: (r.koeder || []).join(' + ') || null, spotName: r.spot || null, rig: r.montage || null,
+      spotXY: r.kx != null ? { x: r.kx, y: r.ky } : null, entfernungM: r.entfernungM || null
     }));
     if (!e) return;
     if (datei) await sicher(() => savePhoto(e.id, datei));
@@ -180,6 +181,7 @@ route('ruten', async () => {
   const a = await brauchtAnsitz(); if (!a) return h('div');
   const { s } = a;
   const ruten = rutenVon(s);
+  const karte = await mapOf(s.lakeId);
   const neu = async () => {
     const r = ruten.concat([{ nr: (ruten.reduce((m, x) => Math.max(m, x.nr), 0)) + 1 }]);
     if (await sicher(() => sessions.save({ id: s.id, rodSetups: r, rods: r.length }))) go('rute', r[r.length - 1].nr);
@@ -194,6 +196,8 @@ route('ruten', async () => {
           h('span', { class: 'info' }, (r.koeder && r.koeder.length ? r.koeder.join(' + ') : 'Köder noch offen') + (r.montage ? ' · ' + r.montage : ''))),
         icon('pfeil'))),
       h('button', { class: 'btn strich', type: 'button', onclick: neu }, icon('plus'), 'Rute hinzufügen'),
+      karte ? h('button', { class: 'zeile', type: 'button', onclick: () => go('karte', 'platz') }, 'Angelplatz',
+        h('span', { class: 'rechts' }, s.platz ? (s.platz.name || 'gesetzt') : 'noch offen', icon('pfeil'))) : null,
       h('button', { class: 'zeile', type: 'button', onclick: () => go('futter') }, 'Gefüttert',
         h('span', { class: 'rechts' }, 'bisher ' + zahl((s.feedings || []).reduce((x, f) => x + (f.kg || 0), 0)) + ' kg', icon('pfeil')))),
     h('button', { class: 'btn rot', type: 'button', onclick: () => go('ansitz') }, 'Fertig')
@@ -210,18 +214,27 @@ route('rute', async nr => {
   const weite = h('input', { class: 'feld', inputmode: 'numeric', placeholder: 'm', value: r.entfernungM || '', style: 'width:110px;flex:none' });
   const koeder = chips(KOEDER, r.koeder || [], { mehrfach: true });
   const montage = h('input', { class: 'feld', placeholder: 'z. B. Ronnie Rig, 20 cm', value: r.montage || '' });
-  const speichern = async () => {
-    const neu = { nr: r.nr, spot: spot.value.trim() || null, entfernungM: Number(String(weite.value).replace(',', '.')) || null, koeder: koeder.wert(), montage: montage.value.trim() || null };
-    const liste = ruten.some(x => x.nr === r.nr) ? ruten.map(x => (x.nr === r.nr ? neu : x)) : ruten.concat([neu]);
-    if (await sicher(() => sessions.save({ id: s.id, rodSetups: liste, rods: liste.length }))) { toast('Rute ' + r.nr + ' gespeichert'); go('ruten'); }
+  const karte = await mapOf(s.lakeId);
+  const felder = () => {
+    const weiteNeu = Number(String(weite.value).replace(',', '.')) || null;
+    const neu = Object.assign({}, r, { nr: r.nr, spot: spot.value.trim() || null, entfernungM: weiteNeu, koeder: koeder.wert(), montage: montage.value.trim() || null });
+    // Andere Weite als von der Karte: dann gilt die Hand-Eingabe, die Kartenlage bleibt.
+    return neu;
   };
+  const sichern = neu => {
+    const liste = ruten.some(x => x.nr === r.nr) ? ruten.map(x => (x.nr === r.nr ? neu : x)) : ruten.concat([neu]);
+    return sicher(() => sessions.save({ id: s.id, rodSetups: liste, rods: liste.length }));
+  };
+  const speichern = async () => { if (await sichern(felder())) { toast('Rute ' + r.nr + ' gespeichert'); go('ruten'); } };
+  const zurKarte = async () => { if (await sichern(felder())) go('karte', r.nr); };
   const entfernen = async () => {
     const liste = ruten.filter(x => x.nr !== r.nr);
     if (await sicher(() => sessions.save({ id: s.id, rodSetups: liste, rods: Math.max(1, liste.length) }))) go('ruten');
   };
   return seite([
     h('div', { class: 'block', style: 'gap:16px' }, kopf({ zurueck: 'ruten', pille: 'Rute ' + r.nr }), h('h1', {}, 'Rute ' + r.nr)),
-    h('div', { class: 'block' }, lbl('Spot · wo liegt die Rute?'), h('div', { class: 'feldzeile' }, spot, weite)),
+    h('div', { class: 'block' }, lbl('Spot · wo liegt die Rute?'), h('div', { class: 'feldzeile' }, spot, weite),
+      karte ? h('button', { class: 'btn neutral', type: 'button', onclick: zurKarte }, icon('pin'), r.kx != null ? 'Auf der Karte ändern' : 'Auf der Karte markieren') : null),
     h('div', { class: 'block' }, lbl('Köder'), koeder),
     h('div', { class: 'block' }, lbl('Montage'), montage),
     h('div', { class: 'block' }, h('button', { class: 'btn rot', type: 'button', onclick: speichern }, 'Speichern'),

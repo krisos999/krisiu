@@ -1,6 +1,7 @@
 // Start, Gewässer, Logbuch, Auswertung, Krisiu, Einstellungen.
 
-import { lakes, sessions, entries } from '../core/repo.js';
+import { lakes, sessions, entries, mapOf, spotsOf } from '../core/repo.js';
+import { istStartdatei, importStart, startText } from '../core/startdatei.js';
 import { getPosition, nearestLake } from '../core/geo.js';
 import { exportData, importData, toCsv, handOut } from '../core/backup.js';
 import { installState, promptInstall } from '../core/pwa.js';
@@ -206,10 +207,18 @@ route('krisiu', async () => {
 /* ---------- Mehr: Gewässer, Sicherung, App ---------- */
 route('einstellungen', async () => {
   const seen = await alleSeen();
+  const kartenInfo = await Promise.all(seen.map(async l => ({ karte: !!(await mapOf(l.id)), spots: (await spotsOf(l.id)).length })));
   const inst = installState();
   const datei = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onchange: async ev => {
     const f = ev.target.files[0]; if (!f) return;
-    const r = await sicher(async () => importData(JSON.parse(await f.text())));
+    const d = await sicher(async () => { try { return JSON.parse(await f.text()); } catch (e) { throw new Error('Die Datei ist keine lesbare Sicherung.'); } });
+    if (!d) return;
+    if (istStartdatei(d)) {
+      const r = await sicher(() => importStart(d));
+      if (r) { toast('Startdatei eingelesen: ' + startText(r), { ms: 6000 }); syncWeather(); go('einstellungen'); }
+      return;
+    }
+    const r = await sicher(() => importData(d));
     if (r) { toast(`Eingelesen: ${r.added} neu, ${r.updated} geändert, ${r.skipped} unverändert`, { ms: 4500 }); syncWeather(); go('einstellungen'); }
   } });
   const sichern = async () => {
@@ -223,8 +232,9 @@ route('einstellungen', async () => {
   return seite([
     h('div', { class: 'block', style: 'gap:16px' }, kopf({ zurueck: 'start' }), h('h1', {}, 'Mehr')),
     h('div', { class: 'block' }, lbl('Gewässer'),
-      ...seen.map(l => h('div', { class: 'eintrag', style: 'cursor:default' }, h('span', { class: 'text' }, h('span', { class: 'titel' }, l.short + ' · ' + l.name),
-        h('span', { class: 'info' }, l.lat != null ? zahl(l.lat, 4) + ' N · ' + zahl(l.lon, 4) + ' O' : 'ohne Koordinaten – kein Wetter')))),
+      ...seen.map((l, i) => h('div', { class: 'eintrag', style: 'cursor:default' }, h('span', { class: 'text' }, h('span', { class: 'titel' }, l.short + ' · ' + l.name),
+        h('span', { class: 'info' }, [l.lat != null ? zahl(l.lat, 4) + ' N · ' + zahl(l.lon, 4) + ' O' : 'ohne Koordinaten – kein Wetter',
+          kartenInfo[i].karte ? 'Karte ✓' : 'ohne Karte', kartenInfo[i].spots ? kartenInfo[i].spots + ' Spots' : null].filter(Boolean).join(' · '))))),
       h('button', { class: 'btn strich', type: 'button', onclick: () => go('gewaesser', 'neu') }, icon('plus'), 'Gewässer anlegen')),
     h('div', { class: 'block' }, lbl('Sicherung'),
       h('p', { class: 'klein' }, 'Deine Daten liegen nur auf diesem Handy. Sichere sie ab und zu als Datei – zum Beispiel in deine Cloud oder per Mail an dich.'),

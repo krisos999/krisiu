@@ -24,11 +24,16 @@ const MIGRATIONS = [
     photos.createIndex('entryId', 'entryId');
 
     db.createObjectStore('meta', { keyPath: 'key' });
+  },
+  function v2(db) {
+    // Karten der Gewässer (Luftbild, Uferlinie, Tiefenlinien). Kommen aus der privaten Startdatei.
+    const maps = db.createObjectStore('maps', { keyPath: 'id' });
+    maps.createIndex('lakeId', 'lakeId');
   }
 ];
 
 export const DB_VERSION = MIGRATIONS.length;
-export const DATA_STORES = ['lakes', 'spots', 'sessions', 'entries'];
+export const DATA_STORES = ['lakes', 'spots', 'sessions', 'entries', 'maps'];
 export const ALL_STORES = [...DATA_STORES, 'photos', 'meta'];
 
 let dbPromise = null;

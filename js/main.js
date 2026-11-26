@@ -7,6 +7,7 @@ import { on } from './core/bus.js';
 import { show, toast } from './ui/app.js';
 import './ui/start.js';
 import './ui/ansitz.js';
+import './ui/karte.js';
 
 async function start() {
   const root = document.getElementById('app');
