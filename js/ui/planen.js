@@ -142,7 +142,8 @@ function platzTipp(lake, t, b) {
   if (!tipps) return 'Für dieses Gewässer habe ich noch keine Platz-Regeln. Die kommen mit deiner Startdatei oder sobald genug Fänge da sind.';
   const teile = [];
   const mild = isNum(t.nachtMin) && t.nachtMin >= 4;
-  if (b.kaltStabil || (isNum(t.nachtMin) && t.nachtMin < 2)) teile.push(tipps.kalt); else if (mild) teile.push(tipps.mild); else teile.push(tipps.normal || tipps.kalt);
+  const front = b.druckAenderung != null && b.druckAenderung <= -1.5;
+  if (b.kaltStabil || (isNum(t.nachtMin) && t.nachtMin < 2 && !front)) teile.push(tipps.kalt); else if (mild) teile.push(tipps.mild); else teile.push(tipps.normal || tipps.kalt);
   if (t.wind && tipps.wind && tipps.wind[t.wind]) teile.push(tipps.wind[t.wind]);
   return teile.filter(Boolean).join(' ');
 }
