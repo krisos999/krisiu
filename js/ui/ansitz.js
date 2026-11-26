@@ -115,7 +115,7 @@ route('fang', async () => {
     h('div', { class: 'block' }, lbl('Gewicht · freiwillig'), h('div', { class: 'feldzeile' }, gewicht, h('span', { class: 'lbl', style: 'font-size:18px' }, 'kg'))),
     h('div', { class: 'zwei' },
       h('div', { class: 'block eng' }, lbl('Uhrzeit'), zeit),
-      h('div', { class: 'block eng' }, lbl('Foto'), h('label', { class: 'btn neutral', style: 'height:56px' }, icon('kamera'), fotoInfo, foto))),
+      h('div', { class: 'block eng' }, lbl('Foto'), h('label', { class: 'btn neutral', style: 'height:56px;font-size:15px;gap:6px;padding:0 6px;letter-spacing:.04em;white-space:nowrap;overflow:hidden' }, icon('kamera'), fotoInfo, foto))),
     ruten.length ? h('div', { class: 'block' }, lbl('Rute'), rutenChips) : null,
     h('button', { class: 'btn rot', type: 'button', onclick: speichern }, 'Speichern')
   ], { voll: true });
