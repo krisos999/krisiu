@@ -1,4 +1,5 @@
 // Oberflächen-Kern: Elemente bauen, Seiten wechseln (#/seite/wert), Meldungen, Krisiu-Lasche.
+import { abhaengen } from '../dc/laufzeit.js';
 
 export function h(tag, props, ...kids) {
   const el = document.createElement(tag);
@@ -32,6 +33,8 @@ export const icon = name => h('span', { html: ICON[name], style: 'display:inline
 const routes = new Map();
 let current = null;
 export const route = (name, render) => routes.set(name, render);
+/** Übergang: neue Seitennamen aus dem Entwurf zeigen vorerst die bisherige Seite. */
+export const alias = (neu, alt) => { if (!routes.has(neu)) routes.set(neu, p => routes.get(alt)(p)); };
 export function go(name, param) {
   const hash = '#/' + name + (param != null ? '/' + encodeURIComponent(param) : '');
   if (location.hash === hash) show(); else location.hash = hash;
@@ -53,7 +56,8 @@ export async function show() {
       h('button', { class: 'btn neutral', onclick: () => go('start') }, 'Zum Start'));
   }
   if (current !== token) return;
-  root.className = node && node.dataset && node.dataset.voll ? 'voll' : '';
+  root.className = node && node.dataset && node.dataset.dc ? 'dc' : 'alt' + (node && node.dataset && node.dataset.voll ? ' voll' : '');
+  if (!(node && node.dataset && node.dataset.dc)) abhaengen();
   root.replaceChildren(...(node && node.dataset && node.dataset.teile ? [...node.childNodes] : [node]));
   window.scrollTo(0, 0);
 }

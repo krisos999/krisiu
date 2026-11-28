@@ -184,6 +184,7 @@ export async function krisiuFrage() {
   if ((await settings.get('krisiuFrageZu')) === woche) return null;
   return {
     text: '🤩 ' + lang(best.tag) + ' sieht gut aus am ' + best.lake.short + ' (' + '★'.repeat(best.b.sterne) + '). Wann gehen wir angeln?',
+    kurz: lang(best.tag) + ' ' + '★'.repeat(best.b.sterne) + ' am ' + best.lake.short,
     planen: () => go('plantag', best.lake.id + '~' + iso(best.tag) + '~tn'),
     keineZeit: async () => { await settings.set('krisiuFrageZu', woche); toast('Verstanden, ich halt die Füße still … bis nächste Woche. 🥲'); }
   };

@@ -177,6 +177,11 @@ export function tagesSterne(t, vortag, art = 'baggersee') {
     if (['S', 'SW', 'W'].includes(t.wind)) { p += 0.5; gruende.push('Wind aus ' + t.wind); }
     else if (['N', 'NO', 'O'].includes(t.wind)) { p -= 0.5; gruende.push('Wind aus ' + t.wind); }
   }
+  // Erwärmung gegenüber dem Vortag (Methodik: „Erwärmung“ ist gut)
+  if (vortag && isNum(vortag.tagMax) && isNum(t.tagMax)) {
+    const dt = t.tagMax - vortag.tagMax;
+    if (dt >= 2) { p += 0.5; gruende.push('wärmer als am Vortag'); } else if (dt <= -3) { p -= 0.5; gruende.push('kälter als am Vortag'); }
+  }
   if (t.regen >= 0.5 && t.regen <= 8) { p += 0.5; gruende.push('leichter Regen'); } else if (t.regen > 20) { p -= 0.5; gruende.push('sehr viel Regen'); }
   let umschwung = false;
   if (vortag && isNum(vortag.nachtMin) && isNum(t.nachtMin) && t.nachtMin - vortag.nachtMin >= 3 && (t.wolken || 0) >= 60 && ((vortag.wolken || 100) <= 50 || vortag.nachtMin < 2)) {

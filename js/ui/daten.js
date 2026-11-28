@@ -132,7 +132,7 @@ export async function krisiuHinweise(s, lake, wx) {
     const fehl = z.eintraege.filter(e => e.type === 'fehlbiss');
     if (fehl.length && Date.now() - fehl[fehl.length - 1].ts < 2 * HOUR) out.push({ art: 'daumen', text: 'Fehlbiss? Haken noch scharf? Einmal übern Daumennagel.', grund: 'dein Fehlbiss um ' + fehl[fehl.length - 1].time.slice(11) });
     const fang = z.eintraege.filter(e => e.type === 'fang');
-    if (fang.length && Date.now() - fang[fang.length - 1].ts < HOUR) out.push({ art: 'freut', text: 'Glückwunsch! Schon deinen Angelkollegen Bescheid gesagt? Schick ihnen das Foto, gell.', grund: 'dein Fang um ' + fang[fang.length - 1].time.slice(11) });
+    if (fang.length && Date.now() - fang[fang.length - 1].ts < HOUR) out.push({ art: 'freut', text: 'Glückwunsch' + (fang[fang.length - 1].species ? ' zum ' + fang[fang.length - 1].species : '') + '! Schon deinen Angelkollegen Bescheid gesagt? Schick ihnen das Foto, gell.', grund: 'dein Fang um ' + fang[fang.length - 1].time.slice(11) });
     const ohne = (Date.now() - s.startTs) / HOUR;
     if (!z.bisse && ohne >= 24) out.push({ art: 'unruhig', text: '24 Stunden ohne Biss. Wie wär’s mit einem Zig, 3 bis 5 Meter über Grund?', grund: 'dein Ansitz · Faustregel' });
     else if (!z.bisse && ohne >= 6) out.push({ art: 'unruhig', text: 'Sechs Stunden ruhig. Neu legen?', grund: 'dein Ansitz' });

@@ -13,19 +13,24 @@
   --good: var(--green); --warn: #e0b25a; --warn-soft: #3a2f14; --bad: var(--red); --radius: 12px; --font: var(--body);
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.4 var(--body); -webkit-text-size-adjust: 100%; }
+#app.alt, #app.alt * { box-sizing: border-box; }
+* { -webkit-tap-highlight-color: transparent; }
+html, body { min-height: 100%; background: #000; }
+body { margin: 0; background: var(--bg); color: var(--ink); -webkit-text-size-adjust: 100%; }
+#app.alt { font: 400 16px/1.4 var(--body); }
 a { color: var(--ink); text-decoration: none; }
-button { font: inherit; color: inherit; }
+#app.alt button { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
 
-#app {
+#app.dc { max-width: 390px; margin: 0 auto; }
+#app.dc input::placeholder, #app.dc textarea::placeholder { color: #a39f93; }
+#app.dc input[type=range] { accent-color: #00FF5E; }
+#app.alt {
   max-width: 480px; margin: 0 auto; min-height: 100dvh;
   padding: calc(18px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom));
   display: flex; flex-direction: column; gap: 20px;
 }
-#app.voll { justify-content: space-between; }
+#app.alt.voll { justify-content: space-between; }
 .boot { color: var(--muted); }
 .block { display: flex; flex-direction: column; gap: 10px; }
 .block.eng { gap: 8px; }
@@ -41,8 +46,8 @@ button { font: inherit; color: inherit; }
 .punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex: none; }
 .uhr { font: 700 24px/1 var(--cond); font-variant-numeric: tabular-nums; }
 
-h1 { margin: 0; font: 700 40px/1 var(--cond); letter-spacing: .01em; text-transform: uppercase; max-width: 300px; }
-h1.gross { font-size: 60px; line-height: .95; max-width: 330px; }
+#app.alt h1 { margin: 0; font: 700 40px/1 var(--cond); letter-spacing: .01em; text-transform: uppercase; max-width: 300px; }
+#app.alt h1.gross { font-size: 60px; line-height: .95; max-width: 330px; }
 .lbl { font: 600 13px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .unter { margin: 0; font-size: 15px; line-height: 1.4; color: var(--ink2); }
 .klein { font-size: 13px; line-height: 1.35; color: var(--muted); }

@@ -185,7 +185,8 @@ route('krisiu', async () => {
         const [e, t] = STIMMUNG[x.art] || ['🙂', ''];
         return h('div', { class: 'hinweis' }, h('span', { class: 'kopfzeile' }, k(24), e + ' Krisiu ' + t), h('p', {}, x.text), x.grund ? h('span', { class: 'grund' }, 'Beruht auf: ' + x.grund) : null);
       })),
-    h('p', { class: 'klein' }, 'Krisiu arbeitet mit festen Regeln und deinen Daten. Freies Fragen braucht einen KI-Dienst – das kommt später, wenn überhaupt.')
+    h('p', { class: 'klein' }, 'Krisiu arbeitet mit festen Regeln und deinen Daten. Freies Fragen braucht einen KI-Dienst – das kommt später, wenn überhaupt.'),
+    h('button', { class: 'btn neutral', type: 'button', onclick: () => go('einstellungen') }, 'Mehr · Sicherung, Startdatei, App')
   ]);
 });
 

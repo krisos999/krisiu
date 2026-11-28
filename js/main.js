@@ -11,6 +11,19 @@ import './ui/karte.js';
 import './ui/auswertung.js';
 import './ui/fische.js';
 import './ui/planen.js';
+import './seiten/Main.js';
+import './seiten/Ansitz.js';
+import './seiten/ChancenHeute.js';
+import './seiten/Fang.js';
+import './seiten/Rute.js';
+import './seiten/RuteWieVorher.js';
+import './seiten/Ruten.js';
+import './seiten/RuteEinrichten.js';
+import './seiten/Spot.js';
+import './seiten/Futter.js';
+import './seiten/Beenden.js';
+import './seiten/Sprache.js';
+import './seiten/uebergang.js';
 
 async function start() {
   const root = document.getElementById('app');
