@@ -204,7 +204,7 @@ async function mitteilungenBlock() {
   const aus = async () => { await sicher(() => M.ausschalten()); toast('Mitteilungen sind aus.'); go('einstellungen'); };
   return h('div', { class: 'block' }, lbl('Mitteilungen'),
     h('p', { class: 'klein' }, an ? 'An ✓ – Krisiu meldet sich bei Umschwung, Front, am Wochenende, bei Warnungen und abends beim Ansitz. Welche, stellst du im Beißphasen-Wecker ein.'
-      : 'Damit Krisiu sich auch meldet, wenn die App zu ist, braucht er einen kleinen eigenen Server. Den legst du einmal bei Cloudflare an (Anleitung im Projekt) und trägst hier seine Adresse ein.'),
+      : 'Die Ansitz-Mitteilung mit „Biss!“ und „Sprechen“ geht auch so – Krisiu fragt beim Angeln-Starten einmal, ob er darf. Für Beißphasen-Wecker, Front-Warnung und „daheim melden“ braucht er einen kleinen eigenen Server: einmal bei Cloudflare anlegen (Anleitung im Projekt) und hier die Adresse eintragen.'),
     feld,
     h('button', { class: 'btn ' + (an ? 'neutral' : 'rot'), type: 'button', onclick: einschalten }, an ? 'Neu verbinden' : 'Mitteilungen einschalten'),
     an ? h('button', { class: 'btn neutral', type: 'button', onclick: test }, 'Test-Mitteilung schicken') : null,

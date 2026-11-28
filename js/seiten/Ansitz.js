@@ -41,6 +41,7 @@ class Ansitz extends DCLogic {
     if (this.props.daten.lake) tagesBewertung(this.props.daten.lake).then(bw => this.setState({ bw })).catch(() => {});
     this.hinweiseHolen(); this.hUhr = setInterval(() => this.hinweiseHolen(), 5 * 60000);
     this.mitteilung(); this.mUhr = setInterval(() => this.mitteilung(), 10 * 60000);
+    this.erl = () => this.mitteilung(); window.addEventListener('krisiu-erlaubnis', this.erl);
     const t = sessionStorage.getItem('krisiu-toast');
     if (t) { sessionStorage.removeItem('krisiu-toast'); this.zeige(t); }
   }
@@ -51,7 +52,7 @@ class Ansitz extends DCLogic {
     const M = await import('../core/mitteilungen.js');
     M.ansitzMitteilung({ titel: 'Krisiu · Ansitz läuft', text: [lake ? lake.name : null, dauer(Date.now() - s.startTs), z ? z.fische + (z.fische === 1 ? ' Fisch' : ' Fische') : null].filter(Boolean).join(' · ') });
   }
-  componentWillUnmount() { clearInterval(this.mUhr); clearInterval(this.uhr); clearInterval(this.hUhr); clearTimeout(this._t); if (this.aus) this.aus(); }
+  componentWillUnmount() { window.removeEventListener('krisiu-erlaubnis', this.erl); clearInterval(this.mUhr); clearInterval(this.uhr); clearInterval(this.hUhr); clearTimeout(this._t); if (this.aus) this.aus(); }
   /** Krisiu-Hinweise nach festen Regeln; „Später“ blendet 30 Minuten aus, die andere Antwort für diesen Ansitz. */
   async hinweiseHolen() {
     const { s, lake } = this.props.daten;

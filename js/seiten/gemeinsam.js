@@ -6,6 +6,9 @@ import { jetzt, alleSeen, beendeteAnsitze } from '../ui/daten.js';
 
 /** „Angeln starten“: Gewässer über den Standort erkennen und den Ansitz sofort beginnen. */
 export async function ansitzStarten() {
+  // Einmal fragen, ob Krisiu die Ansitz-Mitteilung (Biss! · Sprechen) zeigen darf – geht auch ohne eigenen Server.
+  // Direkt beim Antippen fragen, solange das Handy den Tipp noch als Bedienung zählt.
+  try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(p => { if (p === 'granted') window.dispatchEvent(new Event('krisiu-erlaubnis')); }).catch(() => {}); } catch (e) { /* alte Browser */ }
   const seen = await alleSeen();
   if (!seen.length) return go('gewaesser', 'neu');
   let lake = seen.length === 1 ? seen[0] : null;
