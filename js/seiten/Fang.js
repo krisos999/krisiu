@@ -25,7 +25,7 @@ export const ruteKurz = r => [r.spot, (r.koeder || []).join(' und ')].filter(Boo
 
 const Basis = mache(DCLogic);
 class Fang extends Basis {
-  componentDidMount() { if (!this.props.daten) go('Main'); }
+  componentDidMount() { const d = this.props.daten; if (!d) return go('Main'); if (d.nr || d.zeit) this.setState({ nr: d.nr || undefined, zeit: d.zeit || undefined }); }
   extra(st) {
     const d = this.props.daten; if (!d) return {};
     const s = d.s, ruten = rutenVon(s);
@@ -60,4 +60,4 @@ class Fang extends Basis {
   }
 }
 
-dcSeite(V, Fang, async () => { const s = await laufenderAnsitz(); return s ? { s } : null; }, { auch: ['fang'] });
+dcSeite(V, Fang, async p => { const s = await laufenderAnsitz(); if (!s) return null; const [nr, zeit] = String(p || '').split('~'); return { s, nr: Number(nr) || null, zeit: /^\d\d:\d\d$/.test(zeit || '') ? zeit : null }; }, { auch: ['fang'] });

@@ -191,6 +191,27 @@ route('krisiu', async () => {
 });
 
 /* ---------- Mehr: Gewässer, Sicherung, App ---------- */
+/** Mitteilungen: eigener Krisiu-Server (Cloudflare Worker) – Adresse eintragen, einschalten, testen. */
+async function mitteilungenBlock() {
+  const M = await import('../core/mitteilungen.js');
+  const server = await M.serverHolen(), an = server && M.erlaubnis() === 'granted';
+  const feld = h('input', { class: 'feld', type: 'url', placeholder: 'https://krisiu.dein-name.workers.dev', value: server || '', 'aria-label': 'Adresse deines Krisiu-Servers' });
+  const einschalten = async () => {
+    if (!/^https:\/\/\S+\.\S+/.test(feld.value.trim())) { toast('Erst die Adresse deines Krisiu-Servers eintragen (beginnt mit https://).', { fehler: true }); feld.focus(); return; }
+    if (await sicher(() => M.einschalten(feld.value))) { toast('Mitteilungen sind an ✓'); go('einstellungen'); }
+  };
+  const test = async () => { const r = await sicher(() => M.testSchicken()); if (r) toast(r.ok ? 'Test verschickt – gleich kommt die Mitteilung.' : 'Der Server hat nicht geantwortet.'); };
+  const aus = async () => { await sicher(() => M.ausschalten()); toast('Mitteilungen sind aus.'); go('einstellungen'); };
+  return h('div', { class: 'block' }, lbl('Mitteilungen'),
+    h('p', { class: 'klein' }, an ? 'An ✓ – Krisiu meldet sich bei Umschwung, Front, am Wochenende, bei Warnungen und abends beim Ansitz. Welche, stellst du im Beißphasen-Wecker ein.'
+      : 'Damit Krisiu sich auch meldet, wenn die App zu ist, braucht er einen kleinen eigenen Server. Den legst du einmal bei Cloudflare an (Anleitung im Projekt) und trägst hier seine Adresse ein.'),
+    feld,
+    h('button', { class: 'btn ' + (an ? 'neutral' : 'rot'), type: 'button', onclick: einschalten }, an ? 'Neu verbinden' : 'Mitteilungen einschalten'),
+    an ? h('button', { class: 'btn neutral', type: 'button', onclick: test }, 'Test-Mitteilung schicken') : null,
+    an ? h('button', { class: 'zurueck', type: 'button', onclick: aus }, 'Mitteilungen ausschalten') : null,
+    h('button', { class: 'zurueck', type: 'button', onclick: () => go('Wecker') }, 'Beißphasen-Wecker einstellen', icon('pfeil')));
+}
+
 route('einstellungen', async () => {
   const seen = await alleSeen();
   const kartenInfo = await Promise.all(seen.map(async l => ({ karte: !!(await mapOf(l.id)), spots: (await spotsOf(l.id)).length })));
@@ -227,6 +248,7 @@ route('einstellungen', async () => {
       h('button', { class: 'btn neutral', type: 'button', onclick: sichern }, 'Sicherung speichern'),
       h('label', { class: 'btn neutral' }, 'Sicherung oder Start-Datei einlesen', datei),
       h('button', { class: 'btn neutral', type: 'button', onclick: csv }, 'Einträge als Tabelle (CSV)')),
+    await mitteilungenBlock(),
     h('div', { class: 'block' }, lbl('App'),
       inst.standalone ? h('p', { class: 'klein' }, 'Installiert ✓') :
         inst.canPrompt ? h('button', { class: 'btn neutral', type: 'button', onclick: () => promptInstall() }, 'Auf den Startbildschirm') :

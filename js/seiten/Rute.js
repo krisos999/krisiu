@@ -29,7 +29,7 @@ export const rutenFormular = Basis => class extends Basis {
   wahlSpezial(g, i) {
     if (g === 'g0' && i === 5 && !this.aktuell('g0').includes(5)) {
       const t = (window.prompt('Welcher Köder?') || '').trim(); if (!t) return true;
-      this.state.anderer = t;
+      this.state = Object.assign({}, this.state || {}, { anderer: t });
     }
     return false;
   }

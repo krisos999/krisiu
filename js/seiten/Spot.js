@@ -86,11 +86,14 @@ class Spot extends Basis {
     const P = st.px !== undefined ? this.inM(st.px, st.py) : null, K = st.kx !== undefined ? this.inM(st.kx, st.ky) : null;
     const w = P && K ? wurfweite(P, K) : null;
     const basisTippen = v.tippen;
+    // Ohne gesetzten Punkt keine Beispiel-Lage aus dem Entwurf zeigen
+    if (st.kx === undefined) Object.assign(v, { pin: 'display: none', linie: 'display: none' });
+    if (st.px === undefined) Object.assign(v, { punkt: 'display: none', schild: 'display: none', linie: 'display: none', ring: 'display: none' });
     return Object.assign(v, {
       kopf: 'Rute ' + d.nr + ' · Spot',
       zurueckLink: d.zweck === 'fang' ? '#/Rute/' + d.nr + '~fang' : '#/RuteEinrichten/' + d.nr + (d.zweck === 'fehlbiss' ? '~fehlbiss' : ''),
       karteRef: el => this.karteZeichnen(el),
-      entfernung: w ? w + ' m' : '–',
+      entfernung: w ? w + ' m' : (d.e.entfernungM || (d.r && d.r.entfernungM)) ? (d.e.entfernungM || d.r.entfernungM) + ' m' : '–',
       schildText: st.platz || d.s.platz ? 'Angelplatz' : st.platzGps ? 'Du' : 'Angelplatz',
       spotName: st.spotName || '', platzName: st.platzName || '',
       spotNameAendern: ev => { this.state.spotName = ev.target.value; this.state.spotAuto = false; },
@@ -112,7 +115,7 @@ class Spot extends Basis {
       },
       uebernehmen: ev => {
         const s2 = this.state || {};
-        if (s2.kx === undefined) { ev.preventDefault(); return; }
+        if (s2.kx === undefined) { ev.preventDefault(); this.zeige && this.zeige('Tipp erst auf die Karte, wo dein Köder liegt'); return; }
         const m = this.inM(s2.kx, s2.ky);
         Object.assign(d.e, { spot: (s2.spotName || '').trim() || 'Spot auf der Karte', entfernungM: w, kx: Math.round(m.x * 10) / 10, ky: Math.round(m.y * 10) / 10 });
       }

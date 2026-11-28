@@ -7,13 +7,14 @@ const HOLE = /\{\{\s*([^}]*?)\s*\}\}/g;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export class DCLogic {
-  constructor(props) { this.props = props || {}; this.state = null; this.__pending = false; }
+  constructor(props) { this.props = props || {}; this.state = {}; this.__pending = false; }   // nie null: Eingabe-Felder schreiben direkt in this.state
   setState(teil) {
     const d = typeof teil === 'function' ? teil(this.state || {}, this.props) : teil;
     this.state = Object.assign({}, this.state || {}, d || {});
     this.__plan();
   }
   forceUpdate() { this.__plan(); }
+  zeige(t) { import('../ui/app.js').then(m => m.toast(t)).catch(() => {}); }   // Standard-Meldung; Entwurfs-Seiten haben ihre eigene
   __plan() {
     if (!this.__mounted || this.__pending) return;
     this.__pending = true;
@@ -116,7 +117,7 @@ function abgleich(alt, neu) {
   for (const a of Array.from(neu.attributes)) if (alt.getAttribute(a.name) !== a.value) alt.setAttribute(a.name, a.value);
   if ((alt.localName === 'input' || alt.localName === 'textarea' || alt.localName === 'select') && neu.hasAttribute('value')) {
     const v = neu.getAttribute('value');
-    if (alt.value !== v && document.activeElement !== alt) alt.value = v;
+    if (alt.value !== v && (document.activeElement !== alt || v === '')) alt.value = v;   // beim Tippen nicht stören, Leeren aber immer
   }
   if (alt.localName === 'input' && (alt.type === 'checkbox' || alt.type === 'radio')) alt.checked = neu.hasAttribute('checked');
   // Ereignisse

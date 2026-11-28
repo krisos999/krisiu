@@ -2,7 +2,7 @@
 // Bei jeder Veröffentlichung VERSION erhöhen (gleich wie APP_VERSION in js/core/version.js)
 // und neue Dateien in SHELL eintragen. Sonst bekommen installierte Geräte die Änderung nicht.
 
-const VERSION = '0.7.0';
+const VERSION = '0.8.0';
 const CACHE = 'fangbuch-' + VERSION;
 const FONTS = 'schrift-1';
 const SHELL = [
@@ -11,6 +11,7 @@ const SHELL = [
   './manifest.webmanifest',
   './bilder/159919767c7ae4496479943887e65569.jpg',
   './bilder/2d0433007675b1fc779f8e886d25f7df.jpg',
+  './bilder/5caae0a988312754168c867dedc2b12a.jpg',
   './bilder/9c4129db401db174604304e5a990e14a.jpg',
   './bilder/c37a1ceb169e84647104abe0346df832.jpg',
   './bilder/e7a2888f3408ec9c14575feb7aa11931.jpg',
@@ -27,6 +28,7 @@ const SHELL = [
   './js/core/db.js',
   './js/core/geo.js',
   './js/core/karte.js',
+  './js/core/mitteilungen.js',
   './js/core/photos.js',
   './js/core/pwa.js',
   './js/core/repo.js',
@@ -48,8 +50,10 @@ const SHELL = [
   './js/seiten/Futter.js',
   './js/seiten/KantenFinder.js',
   './js/seiten/Kontext.js',
+  './js/seiten/Krisiu.js',
   './js/seiten/Logbuch.js',
   './js/seiten/Main.js',
+  './js/seiten/Mitteilungen.js',
   './js/seiten/Nachtragen.js',
   './js/seiten/Planen.js',
   './js/seiten/Replay.js',
@@ -58,6 +62,7 @@ const SHELL = [
   './js/seiten/RuteWieVorher.js',
   './js/seiten/Ruten.js',
   './js/seiten/Saison.js',
+  './js/seiten/Spiel.js',
   './js/seiten/Spot.js',
   './js/seiten/Sprache.js',
   './js/seiten/WetterZwilling.js',
@@ -82,6 +87,8 @@ const SHELL = [
   './js/ui/start.js',
   './js/vorlagen/Ansitz.js',
   './js/vorlagen/Ansitz.logik.js',
+  './js/vorlagen/Assistent.js',
+  './js/vorlagen/Assistent.logik.js',
   './js/vorlagen/Auswertung.js',
   './js/vorlagen/Auswertung.logik.js',
   './js/vorlagen/Beenden.js',
@@ -108,8 +115,16 @@ const SHELL = [
   './js/vorlagen/Futter.logik.js',
   './js/vorlagen/KantenFinder.js',
   './js/vorlagen/KantenFinder.logik.js',
+  './js/vorlagen/KeinNetz.js',
+  './js/vorlagen/KeinNetz.logik.js',
   './js/vorlagen/Kontext.js',
   './js/vorlagen/Kontext.logik.js',
+  './js/vorlagen/KrisiuChat.js',
+  './js/vorlagen/KrisiuChat.logik.js',
+  './js/vorlagen/KrisiuChatNeu.js',
+  './js/vorlagen/KrisiuChatNeu.logik.js',
+  './js/vorlagen/KrisiuChats.js',
+  './js/vorlagen/KrisiuChats.logik.js',
   './js/vorlagen/Logbuch.js',
   './js/vorlagen/Logbuch.logik.js',
   './js/vorlagen/Main.js',
@@ -138,18 +153,25 @@ const SHELL = [
   './js/vorlagen/SaisonKalender.logik.js',
   './js/vorlagen/Schneider.js',
   './js/vorlagen/Schneider.logik.js',
+  './js/vorlagen/SchnellBiss.js',
+  './js/vorlagen/SchnellBiss.logik.js',
+  './js/vorlagen/Spiel.js',
+  './js/vorlagen/Spiel.logik.js',
   './js/vorlagen/Spot.js',
   './js/vorlagen/Spot.logik.js',
   './js/vorlagen/Sprache.js',
   './js/vorlagen/Sprache.logik.js',
   './js/vorlagen/Steckbrief.js',
   './js/vorlagen/Steckbrief.logik.js',
+  './js/vorlagen/Wecker.js',
+  './js/vorlagen/Wecker.logik.js',
   './js/vorlagen/WetterZwilling.js',
   './js/vorlagen/WetterZwilling.logik.js',
   './js/vorlagen/Wiederfang.js',
   './js/vorlagen/Wiederfang.logik.js',
   './js/vorlagen/WindSee.js',
-  './js/vorlagen/WindSee.logik.js'
+  './js/vorlagen/WindSee.logik.js',
+  './worker/krisiu-mitteilungen.js'
 ];
 
 self.addEventListener('install', event => {
@@ -167,6 +189,51 @@ self.addEventListener('activate', event => {
 // Die Seite schaltet eine neue Version erst frei, wenn der Nutzer "Aktualisieren" tippt.
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data && event.data.type === 'PUSH_SERVER') event.waitUntil(pushZiel(event.data));
+});
+
+/* ---------- Mitteilungen vom eigenen Krisiu-Server (Cloudflare Worker) ---------- */
+// Die Mitteilung kommt ohne Inhalt; der Text wird beim Server abgeholt. Wo der Server ist, merkt sich der SW selbst.
+const PUSH = 'krisiu-push';
+async function pushZiel(neu) {
+  const c = await caches.open(PUSH);
+  if (neu) { await c.put('./__push', new Response(JSON.stringify({ server: neu.server, id: neu.id }))); return neu; }
+  const r = await c.match('./__push'); return r ? r.json() : null;
+}
+self.addEventListener('push', event => {
+  event.waitUntil((async () => {
+    const z = await pushZiel();
+    let liste = [];
+    if (z && z.server) { try { liste = await (await fetch(z.server + '/meldung?id=' + encodeURIComponent(z.id))).json(); } catch (e) { liste = []; } }
+    if (!liste.length) liste = [{ art: 'leer', titel: 'Krisiu', text: 'Ich hab was für dich – schau in die App.' }];
+    for (const m of liste) {
+      const opt = { body: m.text, tag: 'krisiu-' + m.art, icon: './icons/icon-192.png', badge: './icons/icon-192.png', data: Object.assign({ url: './#/Main' }, m), vibrate: [120, 60, 120] };
+      if (m.art === 'daheim') opt.actions = [{ action: 'schreiben', title: 'Schreiben' }, { action: 'anrufen', title: 'Anrufen' }];
+      if (m.art === 'frage') { opt.actions = [{ action: 'planen', title: 'Ansitz planen' }, { action: 'keinezeit', title: 'Keine Zeit' }]; opt.data.url = './#/Planen'; }
+      if (m.art === 'umschwung' || m.art === 'wochenende') opt.data.url = './#/Planen';
+      if (m.art === 'front') opt.data.url = './#/Ansitz';
+      await self.registration.showNotification(m.titel || 'Krisiu', opt);
+    }
+  })());
+});
+self.addEventListener('notificationclick', event => {
+  const n = event.notification, d = n.data || {}, a = event.action;
+  let ziel = d.url || './';
+  if (a === 'biss') ziel = './#/SchnellBiss';
+  else if (a === 'sprechen') ziel = './#/Sprache';
+  else if (a === 'planen') ziel = './#/Planen';
+  if (a === 'schreiben' && d.nummer) ziel = 'sms:' + d.nummer + '?body=' + encodeURIComponent('Alles okay, bin noch am Wasser 🎣');
+  else if (a === 'anrufen' && d.nummer) ziel = 'tel:' + d.nummer;
+  else if ((a === 'schreiben' || a === 'anrufen') && !d.nummer) ziel = './#/Wecker';
+  if (n.tag !== 'ansitz') n.close();
+  event.waitUntil((async () => {
+    if (a === 'keinezeit') { const z = await pushZiel(); if (z && z.server) await fetch(z.server + '/keinezeit', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: z.id }) }).catch(() => {}); return; }
+    if (/^(sms|tel):/.test(ziel)) return self.clients.openWindow(ziel);
+    const url = new URL(ziel, self.registration.scope).href;
+    const alle = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of alle) { if ('focus' in c) { await c.focus(); if ('navigate' in c) return c.navigate(url); } }
+    return self.clients.openWindow(url);
+  })());
 });
 
 self.addEventListener('fetch', event => {

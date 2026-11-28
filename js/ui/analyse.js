@@ -45,7 +45,9 @@ export function faktoren(bisse) {
   const druck = zaehle(mitWetter, b => druckKlasse(w(b)));
   if (druck.n) {
     const p = mitWetter.filter(b => isNum(w(b).pressureHpa)).map(b => w(b).pressureHpa);
-    out.push({ key: 'druck', label: 'Luftdruck', wert: druck.top + (p.length > 1 ? ', ' + zahlDe(p[0], 0) + ' → ' + zahlDe(p[p.length - 1], 0) : ''), k: druck.k, n: druck.n, klasse: druck.top });
+    const von = p.length ? zahlDe(p[0], 0) : '', bis = p.length ? zahlDe(p[p.length - 1], 0) : '';
+    const spanne = p.length > 1 ? (von === bis ? ', um ' + von : ', ' + von + ' → ' + bis) : '';
+    out.push({ key: 'druck', label: 'Luftdruck', wert: druck.top + spanne, k: druck.k, n: druck.n, klasse: druck.top });
   }
   const tag = zaehle(bisse, tagesKlasse);
   if (tag.n) out.push({ key: 'tag', label: 'Tageszeit', wert: tag.top, k: tag.k, n: tag.n, klasse: tag.top });

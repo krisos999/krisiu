@@ -37,6 +37,9 @@ import './seiten/WindSee.js';
 import './seiten/KantenFinder.js';
 import './seiten/Replay.js';
 import './seiten/DeeperImport.js';
+import './seiten/Krisiu.js';
+import './seiten/Spiel.js';
+import './seiten/Mitteilungen.js';
 import './seiten/uebergang.js';
 
 async function start() {
@@ -49,7 +52,11 @@ async function start() {
   }
   window.addEventListener('hashchange', show);
   await show();
-  registerServiceWorker().then(checkForUpdate);
+  registerServiceWorker().then(checkForUpdate).then(async () => {
+    // Service Worker wissen lassen, wo er die Texte der Mitteilungen abholt (z. B. nach einem Update)
+    const M = await import('./core/mitteilungen.js');
+    const server = await M.serverHolen(); if (server) M.swBescheid(server, await M.geraetId());
+  }).catch(() => {});
   requestPersistence();
   startWeatherSync();
   on('pwa', d => { if (d && d.updateReady) toast('Neue Version da – tippen zum Aktualisieren', { ms: 8000 }); });

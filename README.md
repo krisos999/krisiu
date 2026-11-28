@@ -3,7 +3,7 @@
 Fangbuch für Angler: Fänge, Bisse, Beobachtungen und Ansitze mit Zeit, Sonne, Mond und Wetter.
 Jeder Nutzer hat sein eigenes Fangbuch; alle Daten liegen nur auf seinem Gerät.
 
-**Stand 0.4.0:** Start, Gewässer, Ansitz mit Wetter und Chancen, Fang mit Foto und Fangkarte, Fehlbiss, Sprechen, Ruten und Plätze, **Karte** (Luftbild, Köder-Spot und Angelplatz antippen, Entfernung), Futter, Beenden, **Auswertung** (Muster, Wetterverlauf, Erweitert, Kontext, Biss-Karte), **Rekorde**, **Fische mit Steckbrief und Wiederfang**, **Ansitz planen** (Sterne aus der Vorhersage), Logbuch, Nachtragen, Krisiu mit festen Regeln, Sicherung. Alles kostenlos, ohne Server; Daten nur auf dem Gerät. Gewässer, Karten, Spots und Platz-Tipps kommen über eine **private Startdatei** (Mehr → einlesen) und stehen nicht im Programm.
+**Stand 0.4.0:** Start, Gewässer, Ansitz mit Wetter und Chancen, Fang mit Foto und Fangkarte, Fehlbiss, Sprechen, Ruten und Plätze, **Karte** (Luftbild, Köder-Spot und Angelplatz antippen, Entfernung), Futter, Beenden, **Auswertung** (Muster, Wetterverlauf, Erweitert, Kontext, Biss-Karte), **Rekorde**, **Fische mit Steckbrief und Wiederfang**, **Ansitz planen** (Sterne aus der Vorhersage), Logbuch, Nachtragen, Krisiu mit festen Regeln, Sicherung. Ohne eigenen Server; Daten nur auf dem Gerät. Gewässer, Karten, Spots und Platz-Tipps kommen über eine **private Startdatei** (Mehr → einlesen) und stehen nicht im Programm.
 
 ## Aufbau
 
@@ -55,7 +55,7 @@ Es gibt keine fremden Bibliotheken und keinen Build-Schritt; die Dateien laufen 
 ## Wetter
 
 1. **Bright Sky** (`api.brightsky.dev`): Messwerte der DWD-Stationen, Deutschland, ab 2010, ohne Schlüssel.
-2. **Open-Meteo**: Wettermodell, weltweit, als Ersatz. Kostenlos für nicht-kommerzielle Nutzung;
+2. **Open-Meteo**: Wettermodell, weltweit, als Ersatz. für nicht-kommerzielle Nutzung frei;
    die Datenlizenz (CC BY 4.0) verlangt die Nennung von Open-Meteo in der App.
 
 Zum Biss gespeichert: Luft, Tiefstwert der Nacht davor, Änderung in 24 h, Luftdruck mit Änderung in 3 h

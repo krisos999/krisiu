@@ -22,5 +22,5 @@ export async function ansitzStarten() {
     ? vorher.rodSetups.map((r, i) => Object.assign({}, r, { nr: i + 1 }))
     : [{ nr: 1 }, { nr: 2 }];
   const s = await sicher(() => sessions.save({ lakeId: lake.id, start: jetzt(), rods: setups.length, rodSetups: setups, feedings: [], erkannt: !!seen.length }));
-  if (s) { toast('Petri Heil! Ansitz am ' + lake.short + ' läuft.'); go('Ansitz'); }
+  if (s) { toast('Petri Heil! Ansitz am ' + lake.short + ' läuft.'); import('../core/mitteilungen.js').then(M => M.ansitzMelden(s, lake)).catch(() => {}); go('Ansitz'); }
 }

@@ -2,7 +2,7 @@
 //
 // Quellen, in dieser Reihenfolge:
 //   1. Bright Sky  – Messwerte der DWD-Stationen (nur Deutschland, ab 2010, ohne Schlüssel).
-//   2. Open-Meteo  – Wettermodell, weltweit. Kostenlos für nicht-kommerzielle Nutzung,
+//   2. Open-Meteo  – Wettermodell, weltweit. Für nicht-kommerzielle Nutzung frei,
 //                    Namensnennung nötig (CC BY 4.0).
 // Eine weitere Quelle braucht nur ein Objekt mit covers() und hours().
 

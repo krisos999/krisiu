@@ -4,7 +4,7 @@ import { dcSeite } from './basis.js';
 import { DCLogic } from '../dc/laufzeit.js';
 import { isNum } from '../core/util.js';
 import { lakes, sessions } from '../core/repo.js';
-import { uhrzeit, datumLang } from '../ui/app.js';
+import { uhrzeit, datumLang, go } from '../ui/app.js';
 import { alleSeen, laufenderAnsitz, beendeteAnsitze, zahlen } from '../ui/daten.js';
 import { tagesBewertung, faktoren, stunden, fensterText, vergleich, TAG_WORT, CHANCE_WORT } from './wetter.js';
 import { sternFarben } from './Ansitz.js';
@@ -47,6 +47,7 @@ class ChancenHeute extends DCLogic {
     const { lake } = this.props.daten;
     if (!lake) return;
     tagesBewertung(lake).then(async bw => {
+      if (!bw.t && navigator.onLine === false) return go('KeinNetz');
       this.setState({ bw, zw: await besterZwilling(lake, bw).catch(() => null) });
     });
   }

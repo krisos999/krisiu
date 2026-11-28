@@ -38,7 +38,7 @@ class Sprache extends DCLogic {
   }
   async speichern() {
     const d = this.props.daten, st = this.state || {}, v = verstehe(st.text || '');
-    if (!(st.text || '').trim()) return;
+    if (!(st.text || '').trim()) { this.zeige && this.zeige(st.hoert ? 'Krisiu hört noch zu – sag z. B. „Biss Rute 2, Spiegler, zwölf Kilo“' : 'Noch nichts verstanden – tipp auf „Nochmal“'); return; }
     const s = d.s, nr = v.rute || (rutenVon(s).find(eingerichtet) || { nr: 1 }).nr;
     if (v.typ === 'fehlbiss') { await fehlbissSpeichern(s, nr); go('Ansitz'); return; }
     if (v.typ === 'futter') {

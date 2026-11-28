@@ -9,6 +9,8 @@ import { eingerichtet } from './fangfluss.js';
 import { spotZeile } from './Rute.js';
 import { tagesBewertung } from './wetter.js';
 
+const kantenZahl = m => (m && m.kanten && Array.isArray(m.kanten.punkte) ? m.kanten.punkte.length : 0);
+
 class Ruten extends DCLogic {
   componentDidMount() {
     const d = this.props.daten; if (!d) return go('Main');
@@ -26,8 +28,8 @@ class Ruten extends DCLogic {
       })),
       hinzufuegen: () => { const frei = rutenVon(d.s).find(r => !eingerichtet(r)); go('RuteEinrichten', String(frei ? frei.nr : rutenVon(d.s).length + 1)); },
       futterText: 'bisher ' + zahl(d.z.futterKg || 0) + ' kg',
-      mitKanten: !!(d.karte && d.karte.kanten && d.karte.kanten.length),
-      kantenText: d.karte && d.karte.kanten ? d.karte.kanten.length + ' Punkte' : '',
+      mitKanten: kantenZahl(d.karte) > 0,
+      kantenText: kantenZahl(d.karte) + ' Punkte',
       windText: st.wind ? 'heute ' + st.wind : 'heute'
     };
   }

@@ -41,6 +41,9 @@ export async function fangSpeichern({ ohneAngaben = false } = {}) {
     spotXY: r.kx != null ? { x: r.kx, y: r.ky } : null, entfernungM: r.entfernungM || null, vorgefuettert: f.vorgefuettert
   }));
   if (!e) return;
+  // Ein offener Schnell-Biss dieser Rute (aus der Mitteilung) war genau dieser Fisch – der fällt weg.
+  const schnell = (await zahlen(s)).eintraege.filter(x => x.notes === 'Schnell-Biss (offen)' && x.id !== e.id && (!x.rod || x.rod === e.rod) && e.ts - x.ts >= -10 * 60000 && e.ts - x.ts < 6 * 3600e3);
+  if (schnell.length) await sicher(() => entries.remove(schnell[schnell.length - 1].id));
   if (f.foto) {
     await sicher(() => savePhoto(e.id, f.foto));
     // Erster Fisch dieser Art mit Foto bekommt gleich einen Steckbrief; sonst fragt „Meine Fänge“: Kennst du den?

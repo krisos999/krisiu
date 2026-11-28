@@ -83,7 +83,7 @@ export function chancen(wx) {
 export const STIMMUNG = {
   happy: ['😄', 'ist happy', 'gruen'], vermisst: ['🥺', 'vermisst das Wasser', ''], unruhig: ['😬', 'wird unruhig', ''],
   genervt: ['😤', 'ist genervt', 'rot'], zufrieden: ['😌', 'ist zufrieden', 'gruen'], hallo: ['👋', 'sagt Hallo', ''],
-  daumen: ['🤞', 'drückt die Daumen', 'gruen'], sorge: ['😟', 'macht sich Sorgen', ''], friert: ['🥶', 'friert mit', ''], freut: ['🎉', 'freut sich mit', 'gruen']
+  langweilt: ['🥱', 'langweilt sich', ''], daumen: ['🤞', 'drückt die Daumen', 'gruen'], sorge: ['😟', 'macht sich Sorgen', ''], friert: ['🥶', 'friert mit', ''], freut: ['🎉', 'freut sich mit', 'gruen']
 };
 
 /** Grundstimmung für Start und Lasche. */

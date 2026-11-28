@@ -38,6 +38,7 @@ class Beenden extends DCLogic {
         sessionStorage.removeItem(ENDE_KEY + ':' + s.id);
         syncWeather();
         toast('Ansitz gespeichert. Petri Dank!');
+        import('../core/mitteilungen.js').then(M => M.ansitzMelden(null)).catch(() => {});
         go('Logbuch');
       },
       verwerfen: async ev => {
@@ -46,6 +47,7 @@ class Beenden extends DCLogic {
         for (const e of z.eintraege) await entries.remove(e.id);
         await sessions.remove(s.id);
         sessionStorage.removeItem(ENDE_KEY + ':' + s.id);
+        import('../core/mitteilungen.js').then(M => M.ansitzMelden(null)).catch(() => {});
         go('Main');
       }
     };

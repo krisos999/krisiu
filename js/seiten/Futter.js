@@ -19,7 +19,7 @@ class Futter extends Basis {
   componentDidMount() { if (!this.props.daten) go('Main'); }
   wahlSpezial(g, i) {
     if (g === 'g0') { this.setState({ menge: MENGEN[i], sel: Object.assign({}, (this.state || {}).sel, { g0: [i] }) }); return true; }
-    if (g === 'g1' && i === 5) { const t = (window.prompt('Welches Futter?') || '').trim(); if (!t) return true; this.state.andere = t; }
+    if (g === 'g1' && i === 5) { const t = (window.prompt('Welches Futter?') || '').trim(); if (!t) return true; this.state = Object.assign({}, this.state || {}, { andere: t }); }
     if (g === 'g2') { this.setState({ fuer: i }); return true; }
     return false;
   }

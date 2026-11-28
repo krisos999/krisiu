@@ -276,7 +276,7 @@ dcSeite(VR, Rekorde, async param => {
     });
     const best = [...naechte.values()].sort((a, b) => b.length - a.length)[0];
     z.push(best
-      ? { titel: 'Meiste Bisse in einer Nacht', info: 'Nacht zum ' + datumKurz(new Date(best[best.length - 1].ts)), wert: String(best.length), hat: true, neu: frisch(best[best.length - 1].ts) }
+      ? { titel: 'Meiste Bisse in einer Nacht', info: 'Nacht zum ' + datumKurz(new Date(best[best.length - 1].ts)), wert: String(best.length), hat: true, neu: frisch(best[best.length - 1].ts), link: best[0].sessionId ? '#/Auswertung/' + best[0].sessionId : null }
       : { titel: 'Meiste Bisse in einer Nacht', info: 'Bisszeiten fehlen noch', wert: '–' });
     // nur der jüngste neue Rekord leuchtet
     let jung = null; z.forEach(r => { if (r.neu && !jung) jung = r; }); z.forEach(r => { r.neu = r === jung; });

@@ -40,10 +40,18 @@ class Ansitz extends DCLogic {
     this.aus = on('data', async () => { const d = await this.props.neuLaden(); if (d) { this.props.daten = d; this.forceUpdate(); } });
     if (this.props.daten.lake) tagesBewertung(this.props.daten.lake).then(bw => this.setState({ bw })).catch(() => {});
     this.hinweiseHolen(); this.hUhr = setInterval(() => this.hinweiseHolen(), 5 * 60000);
+    this.mitteilung(); this.mUhr = setInterval(() => this.mitteilung(), 10 * 60000);
     const t = sessionStorage.getItem('krisiu-toast');
     if (t) { sessionStorage.removeItem('krisiu-toast'); this.zeige(t); }
   }
-  componentWillUnmount() { clearInterval(this.uhr); clearInterval(this.hUhr); clearTimeout(this._t); if (this.aus) this.aus(); }
+  /** Die stille Ansitz-Mitteilung mit „Biss!“ und „Sprechen“ aktuell halten. */
+  async mitteilung() {
+    const { s, lake } = this.props.daten || {}; if (!s) return;
+    const z = await zahlen(s).catch(() => null);
+    const M = await import('../core/mitteilungen.js');
+    M.ansitzMitteilung({ titel: 'Krisiu · Ansitz läuft', text: [lake ? lake.name : null, dauer(Date.now() - s.startTs), z ? z.fische + (z.fische === 1 ? ' Fisch' : ' Fische') : null].filter(Boolean).join(' · ') });
+  }
+  componentWillUnmount() { clearInterval(this.mUhr); clearInterval(this.uhr); clearInterval(this.hUhr); clearTimeout(this._t); if (this.aus) this.aus(); }
   /** Krisiu-Hinweise nach festen Regeln; „Später“ blendet 30 Minuten aus, die andere Antwort für diesen Ansitz. */
   async hinweiseHolen() {
     const { s, lake } = this.props.daten;
@@ -52,14 +60,26 @@ class Ansitz extends DCLogic {
     const prio = x => (/^dein Fang/.test(x.grund || '') ? 3 : /^dein Fehlbiss/.test(x.grund || '') ? 2 : 1);
     liste.sort((a, b) => prio(b) - prio(a));
     const zu = (await settings.get('hinweise-zu:' + s.id)) || {};
-    const h = liste.find(x => !(zu[x.text] > Date.now()));
+    // Wenn lange nix los ist: Krisiu schlägt eine Runde Boilie-Jagd vor (Entwurf „SpielVorschlag“)
+    const z = await zahlen(s).catch(() => null);
+    const letzte = z && z.eintraege.length ? Math.max(s.startTs, ...z.eintraege.filter(e => e.type !== 'beobachtung').map(e => e.ts)) : s.startTs;
+    const ruhig = (Date.now() - letzte) / 3600e3;
+    if (ruhig >= 2) {
+      const hh = Math.floor(ruhig), mm = Math.floor((ruhig - hh) * 60);
+      liste.push({ art: 'langweilt', spiel: true, schluessel: 'spiel', text: `Seit ${hh} ${hh === 1 ? 'Stunde' : 'Stunden'}${mm >= 5 ? ' ' + mm : ''} kein Zupfer. Lust auf eine Runde Boilie-Jagd? Läuft auch ohne Netz – und mit Pause, sobald sich an den Ruten was tut.`, grund: 'dein Ansitz' });
+    }
+    // Offene Schnell-Bisse aus der Mitteilung zuerst: Fang oder Fehlbiss?
+    (z ? z.eintraege : []).filter(e => e.notes === 'Schnell-Biss (offen)' && Date.now() - e.ts < 6 * 3600e3).forEach(e => {
+      liste.unshift({ art: 'daumen', schnell: e, schluessel: 'schnell:' + e.id, text: `Biss um ${e.time.slice(11)}${e.rod ? ' an ' + e.rod : ''} – war’s ein Fisch? Dann trag ihn ein.`, grund: 'dein Biss' });
+    });
+    const h = liste.find(x => !(zu[x.schluessel || x.text] > Date.now()));
     this.setState({ hinweisRoh: h || null });
   }
   async hinweisWeg(dauerMs) {
     const h = (this.state || {}).hinweisRoh; if (!h) return;
     const key = 'hinweise-zu:' + this.props.daten.s.id;
     const zu = (await settings.get(key)) || {};
-    zu[h.text] = Date.now() + dauerMs; await settings.set(key, zu);
+    zu[h.schluessel || h.text] = Date.now() + dauerMs; await settings.set(key, zu);
     this.setState({ hinweisRoh: null });
     setTimeout(() => this.hinweiseHolen(), 50);
   }
@@ -112,10 +132,22 @@ class Ansitz extends DCLogic {
       hinweis: st.hinweisRoh ? (() => {
         const h = st.hinweisRoh, [e, t] = STIMMUNG[h.art] || ['🙂', 'sagt'];
         const rot = ['sorge', 'genervt', 'unruhig', 'friert'].includes(h.art);
+        if (h.spiel) return { stimmung: t + ' ' + e, wann: 'jetzt', text: h.text, ja: 'Spielen', nein: 'Nein danke', farbe: '#00FF5E' };
+        if (h.schnell) return { stimmung: t + ' ' + e, wann: h.schnell.time.slice(11), text: h.text, ja: 'Fang', nein: 'Fehlbiss', farbe: '#00FF5E' };
         return { stimmung: t + ' ' + e, wann: 'jetzt', text: h.text, ja: h.art === 'freut' ? 'Gemacht' : 'Okay', nein: 'Später', farbe: rot ? '#ff1e1e' : '#00FF5E' };
       })() : null,
-      hinweisJa: ev => { if (ev) { ev.preventDefault(); ev.stopPropagation(); } this.hinweisWeg(1e12); },
-      hinweisSpaeter: ev => { if (ev) { ev.preventDefault(); ev.stopPropagation(); } this.hinweisWeg(30 * 60000); }
+      hinweisJa: ev => {
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        const hr = st.hinweisRoh || {};
+        if (hr.schnell) { const nr = Number(String(hr.schnell.rod || '').replace(/\D/g, '')) || ''; return go('Fang', nr + '~' + hr.schnell.time.slice(11)); }
+        this.hinweisWeg(hr.spiel ? 2 * 3600e3 : 1e12); if (hr.spiel) go('Spiel');
+      },
+      hinweisSpaeter: async ev => {
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        const hr = st.hinweisRoh || {};
+        if (hr.schnell) { await sicher(() => entries.save(Object.assign({}, hr.schnell, { notes: null }))); this.zeige('Als Fehlbiss gespeichert'); return this.hinweisWeg(1e12); }
+        this.hinweisWeg(hr.spiel ? 2 * 3600e3 : 30 * 60000);
+      }
     };
   }
 }
