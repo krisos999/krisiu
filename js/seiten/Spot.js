@@ -10,6 +10,8 @@ import { sv, grundkarte } from '../ui/karte.js';
 import { go, sicher } from '../ui/app.js';
 import { laufenderAnsitz, rutenVon } from '../ui/daten.js';
 import { rutenEntwurfVon } from './fangfluss.js';
+import { tiefenPunkte, deeperSchluessel } from './DeeperImport.js';
+import { settings } from '../core/repo.js';
 
 const B = 342, H = 400, BONE = '#ece8dc';
 
@@ -58,7 +60,7 @@ class Spot extends Basis {
     el.__luft = luft;
     const { sc, x0, y0 } = this.v;
     const svg = sv('svg', { width: B, height: H, viewBox: `${x0} ${y0} ${B / sc} ${H / sc}`, style: 'position:absolute;left:0;top:0;display:block', role: 'img', 'aria-label': 'Karte ' + d.lake.name },
-      ...grundkarte(d.map, sc, { luft, spots: d.spots, breite: B, x0 }));
+      ...grundkarte(d.map, sc, { luft, spots: d.spots, breite: B, x0 }), ...(d.deeper ? tiefenPunkte(d.deeper.punkte, sc, 1.3) : []));
     // Maßstab, Quelle, Übersicht – in Bildschirm-Pixeln
     const L = [5, 10, 20, 25, 50, 100, 200, 250, 500].find(m => m * sc >= 34) || 500, px = L * sc;
     const ov = sv('svg', { width: B, height: H, style: 'position:absolute;left:0;top:0;display:block;pointer-events:none' },
@@ -126,5 +128,5 @@ dcSeite(V, Spot, async p => {
   const r = rutenVon(s).find(x => x.nr === nr) || null, e = rutenEntwurfVon(s, nr);
   if (!map) return { s, nr, map: null };
   const pkt = spots.map(x => ({ x: x.x, y: x.y })).concat(s.platz || map.platz ? [s.platz || map.platz] : [], e.kx != null ? [{ x: e.kx, y: e.ky }] : r && r.kx != null ? [{ x: r.kx, y: r.ky }] : []);
-  return { s, lake, map, spots, nr, zweck: zweck || 'einrichten', r, e, view: ausschnitt(map, pkt) };
+  return { s, lake, map, spots, nr, zweck: zweck || 'einrichten', r, e, view: ausschnitt(map, pkt), deeper: await settings.get(deeperSchluessel(lake.id), null) };
 }, { auch: ['SpotVSA'] });

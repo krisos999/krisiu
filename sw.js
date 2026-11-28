@@ -2,7 +2,7 @@
 // Bei jeder Veröffentlichung VERSION erhöhen (gleich wie APP_VERSION in js/core/version.js)
 // und neue Dateien in SHELL eintragen. Sonst bekommen installierte Geräte die Änderung nicht.
 
-const VERSION = '0.6.0';
+const VERSION = '0.7.0';
 const CACHE = 'fangbuch-' + VERSION;
 const FONTS = 'schrift-1';
 const SHELL = [
@@ -41,25 +41,32 @@ const SHELL = [
   './js/seiten/Beenden.js',
   './js/seiten/BissKarte.js',
   './js/seiten/ChancenHeute.js',
+  './js/seiten/DeeperImport.js',
   './js/seiten/Faenge.js',
   './js/seiten/Fang.js',
   './js/seiten/Fische.js',
   './js/seiten/Futter.js',
+  './js/seiten/KantenFinder.js',
   './js/seiten/Kontext.js',
   './js/seiten/Logbuch.js',
   './js/seiten/Main.js',
   './js/seiten/Nachtragen.js',
   './js/seiten/Planen.js',
+  './js/seiten/Replay.js',
   './js/seiten/Rute.js',
   './js/seiten/RuteEinrichten.js',
   './js/seiten/RuteWieVorher.js',
   './js/seiten/Ruten.js',
+  './js/seiten/Saison.js',
   './js/seiten/Spot.js',
   './js/seiten/Sprache.js',
+  './js/seiten/WetterZwilling.js',
+  './js/seiten/WindSee.js',
   './js/seiten/basis.js',
   './js/seiten/fangfluss.js',
   './js/seiten/gemeinsam.js',
   './js/seiten/uebergang.js',
+  './js/seiten/ufer.js',
   './js/seiten/verlauf.js',
   './js/seiten/wetter.js',
   './js/ui/analyse.js',
@@ -85,6 +92,8 @@ const SHELL = [
   './js/vorlagen/BissKarte.logik.js',
   './js/vorlagen/ChancenHeute.js',
   './js/vorlagen/ChancenHeute.logik.js',
+  './js/vorlagen/DeeperImport.js',
+  './js/vorlagen/DeeperImport.logik.js',
   './js/vorlagen/Erweitert.js',
   './js/vorlagen/Erweitert.logik.js',
   './js/vorlagen/Faenge.js',
@@ -97,6 +106,8 @@ const SHELL = [
   './js/vorlagen/Fische.logik.js',
   './js/vorlagen/Futter.js',
   './js/vorlagen/Futter.logik.js',
+  './js/vorlagen/KantenFinder.js',
+  './js/vorlagen/KantenFinder.logik.js',
   './js/vorlagen/Kontext.js',
   './js/vorlagen/Kontext.logik.js',
   './js/vorlagen/Logbuch.js',
@@ -113,6 +124,8 @@ const SHELL = [
   './js/vorlagen/Planen.logik.js',
   './js/vorlagen/Rekorde.js',
   './js/vorlagen/Rekorde.logik.js',
+  './js/vorlagen/Replay.js',
+  './js/vorlagen/Replay.logik.js',
   './js/vorlagen/Rute.js',
   './js/vorlagen/Rute.logik.js',
   './js/vorlagen/RuteEinrichten.js',
@@ -121,14 +134,22 @@ const SHELL = [
   './js/vorlagen/RuteWieVorher.logik.js',
   './js/vorlagen/Ruten.js',
   './js/vorlagen/Ruten.logik.js',
+  './js/vorlagen/SaisonKalender.js',
+  './js/vorlagen/SaisonKalender.logik.js',
+  './js/vorlagen/Schneider.js',
+  './js/vorlagen/Schneider.logik.js',
   './js/vorlagen/Spot.js',
   './js/vorlagen/Spot.logik.js',
   './js/vorlagen/Sprache.js',
   './js/vorlagen/Sprache.logik.js',
   './js/vorlagen/Steckbrief.js',
   './js/vorlagen/Steckbrief.logik.js',
+  './js/vorlagen/WetterZwilling.js',
+  './js/vorlagen/WetterZwilling.logik.js',
   './js/vorlagen/Wiederfang.js',
-  './js/vorlagen/Wiederfang.logik.js'
+  './js/vorlagen/Wiederfang.logik.js',
+  './js/vorlagen/WindSee.js',
+  './js/vorlagen/WindSee.logik.js'
 ];
 
 self.addEventListener('install', event => {

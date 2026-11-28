@@ -135,7 +135,16 @@ export const maps = makeRepo('maps', 'm', async map => {
   const L = map.layers && typeof map.layers === 'object' ? map.layers : {};
   const schicht = x => (x && typeof x.image === 'string' && /^data:image\/(png|webp);base64,/.test(x.image) && ['x', 'y', 'w', 'h'].every(k => isNum(x[k])) && x.w > 0 && x.h > 0
     ? { image: x.image, x: x.x, y: x.y, w: x.w, h: x.h, von: text(x.von), bis: text(x.bis) } : null);
-  map.layers = { tiefe: schicht(L.tiefe), grund: schicht(L.grund), quelle: text(L.quelle) };
+  map.layers = { tiefe: schicht(L.tiefe), grund: schicht(L.grund), gefaelle: schicht(L.gefaelle), quelle: text(L.quelle) };
+  // Kanten-Finder (Deeper): Punkte mit Lage in Kartenmetern
+  const K = map.kanten;
+  map.kanten = K && Array.isArray(K.punkte) && K.punkte.length ? {
+    datum: text(K.datum), start: text(K.start), tipp: text(K.tipp), tippKopf: text(K.tippKopf), hinweis: text(K.hinweis),
+    rahmen: K.rahmen && ['x', 'y', 'w', 'h'].every(k => isNum(K.rahmen[k])) ? { x: K.rahmen.x, y: K.rahmen.y, w: K.rahmen.w, h: K.rahmen.h } : null,
+    punkte: K.punkte.filter(q => q && isNum(q.x) && isNum(q.y) && text(q.id)).map(q => ({ id: text(q.id), name: text(q.name) || text(q.id), art: ['Kante', 'Kuppe', 'Rinne'].includes(q.art) ? q.art : 'Kante', gruppe: text(q.gruppe),
+      a: num(q.a), b: num(q.b), sprung: num(q.sprung), mal: num(q.mal), weg: text(q.weg), gps: text(q.gps), notiz: text(q.notiz), x: q.x, y: q.y })),
+    gruppen: (Array.isArray(K.gruppen) ? K.gruppen : []).filter(g => g && text(g.g)).map(g => ({ g: text(g.g), name: text(g.name), filter: text(g.filter), k: num(g.k) || 2, c: g.c, label: g.label }))
+  } : null;
   delete map.labels;
   return map;
 });

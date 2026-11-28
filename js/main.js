@@ -31,6 +31,12 @@ import './seiten/Fische.js';
 import './seiten/Kontext.js';
 import './seiten/BissKarte.js';
 import './seiten/Planen.js';
+import './seiten/Saison.js';
+import './seiten/WetterZwilling.js';
+import './seiten/WindSee.js';
+import './seiten/KantenFinder.js';
+import './seiten/Replay.js';
+import './seiten/DeeperImport.js';
 import './seiten/uebergang.js';
 
 async function start() {

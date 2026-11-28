@@ -9,6 +9,7 @@ import { datumKurz } from '../ui/app.js';
 import { alleSeen, eintraegeVon, rutenVon, laufenderAnsitz, wetterJetzt } from '../ui/daten.js';
 import { bisseAus } from '../ui/analyse.js';
 import { bewerte, platzTipp } from '../ui/planen.js';
+import { uferSeiten } from './ufer.js';
 
 const R8 = ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'];
 const FARBEN = ['#7ee0ff', '#ff8a3d', '#c792ff', '#ffd21e', '#ff5fa2', '#9dff7a'];
@@ -43,32 +44,7 @@ const klasse = (rgb, pal) => {
   return d < 2500 ? best : null;
 };
 
-/** Wasser-Test: im Uferpolygon und nicht auf einer Insel. */
-function imWasser(map, x, y) {
-  const drin = pts => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
-  const ufer = map.lines.filter(l => l.art === 'ufer');
-  return ufer.some(l => drin(l.pts)) && !map.lines.filter(l => l.art === 'insel').some(l => drin(l.pts));
-}
-/** Ufer, auf das der Wind drückt (auflandig): Abschnitte, deren Außenseite in Windrichtung zeigt. */
-function auflandig(map, windVon) {
-  const deg = R8.indexOf(windVon) * 45; if (deg < 0) return [];
-  const rad = (deg + 180) * Math.PI / 180, wx = Math.sin(rad), wy = -Math.cos(rad);   // Richtung, in die der Wind weht (y nach Süden)
-  const out = [];
-  map.lines.filter(l => l.art === 'ufer').forEach(l => {
-    let lauf = [];
-    const n = l.pts.length;
-    for (let i = 0; i < n; i++) {
-      const a = l.pts[i], b = l.pts[(i + 1) % n], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
-      let nx = dy / len, ny = -dx / len;
-      const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
-      if (imWasser(map, mx + nx * 3, my + ny * 3)) { nx = -nx; ny = -ny; }
-      if (nx * wx + ny * wy > 0.55) { if (!lauf.length) lauf.push(a); lauf.push(b); }
-      else if (lauf.length) { if (lauf.length > 2) out.push(lauf); lauf = []; }
-    }
-    if (lauf.length > 2) out.push(lauf);
-  });
-  return out;
-}
+const auflandig = (map, dir) => uferSeiten(map, dir).auf;
 
 class BissKarte extends DCLogic {
   async componentDidMount() {
