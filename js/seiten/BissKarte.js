@@ -123,7 +123,7 @@ class BissKarte extends DCLogic {
     // Darüber in Bildpunkten: Namen, Heute, Ruten, Bisse
     const o = [];
     o.push(`<defs><radialGradient id="bk-waerme"><stop offset="0" stop-color="#ff5a1e" stop-opacity="0.9"></stop><stop offset="0.45" stop-color="#ff9a1e" stop-opacity="0.45"></stop><stop offset="1" stop-color="#ffd21e" stop-opacity="0"></stop></radialGradient></defs>`);
-    // Fangzonen: Spots mit Bissen bekommen einen gestrichelten Ring und ihren Namen
+    // Spots mit Bissen bekommen einen gestrichelten Ring und ihren Namen
     const zonen = new Map();
     d.B.forEach(b => { if (b.x != null && b.spotName) zonen.set(b.spotName, (zonen.get(b.spotName) || 0) + 1); });
     d.spots.filter(sp => zonen.has(sp.name)).forEach(sp => {
