@@ -22,7 +22,7 @@ const wetterKurz = w => (w ? [isNum(w.pressureHpa) ? zahl(w.pressureHpa) + ' hPa
   regenKlasse(w) === 'Regen' ? 'Regen' : regenKlasse(w) === 'trocken' ? 'trocken' : null].filter(Boolean).join(' · ') : 'Wetter fehlt noch');
 const fischWort = (n, alleKarpfen) => n + ' ' + (alleKarpfen ? (n === 1 ? 'Karpfen' : 'Karpfen') : (n === 1 ? 'Fisch' : 'Fische'));
 
-async function ladeAnsitz(id) {
+export async function ladeAnsitz(id) {
   const s = id ? await sessions.get(id) : (await beendeteAnsitze())[0];
   if (!s) return null;
   const lake = await lakes.get(s.lakeId);

@@ -23,6 +23,14 @@ import './seiten/Spot.js';
 import './seiten/Futter.js';
 import './seiten/Beenden.js';
 import './seiten/Sprache.js';
+import './seiten/Auswertung.js';
+import './seiten/Logbuch.js';
+import './seiten/Nachtragen.js';
+import './seiten/Faenge.js';
+import './seiten/Fische.js';
+import './seiten/Kontext.js';
+import './seiten/BissKarte.js';
+import './seiten/Planen.js';
 import './seiten/uebergang.js';
 
 async function start() {

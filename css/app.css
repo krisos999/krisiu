@@ -133,9 +133,9 @@ textarea.feld { height: 96px; padding: 12px 14px; font: 400 16px/1.4 var(--body)
 /* Technik-Test (altes Gerüst) */
 .card { background: var(--s2); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .muted { color: var(--muted); } .small { font-size: 14px; }
-h2 { font-size: 18px; line-height: 1.2; margin: 0 0 10px; }
-label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--muted); }
-input, select, textarea { font: inherit; color: var(--ink); background: var(--s1); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; min-height: 44px; }
+#app.alt h2 { font-size: 18px; line-height: 1.2; margin: 0 0 10px; }
+#app.alt label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--muted); }
+#app.alt input, #app.alt select, #app.alt textarea { font: inherit; color: var(--ink); background: var(--s1); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; min-height: 44px; }
 .card button, .card .button { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line2); background: var(--s1); color: var(--ink); cursor: pointer; }
 
 /* ---------- Karte (Spot markieren, Angelplatz) ---------- */

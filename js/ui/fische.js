@@ -12,18 +12,18 @@ import { druckKlasse, tagesKlasse, regenKlasse } from './analyse.js';
 const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const urls = [];
 const bildUrl = blob => { if (!blob) return null; const u = URL.createObjectURL(blob); urls.push(u); if (urls.length > 60) URL.revokeObjectURL(urls.shift()); return u; };
-async function fotoVon(entryId, gross = false) {
+export async function fotoVon(entryId, gross = false) {
   const p = (await photosOf(entryId))[0];
   return p ? bildUrl(gross ? p.blob : p.thumb || p.blob) : null;
 }
 const foto = (url, klasse = 'foto', alt = 'Fangfoto') => (url ? h('img', { class: klasse, src: url, alt }) : h('div', { class: klasse + ' leerfoto' }, 'Kein Foto'));
-const wetterZeile = w => (w ? [isNum(w.tempC) ? zahl(w.tempC) + ' °C' : null, isNum(w.pressureHpa) ? zahl(w.pressureHpa, 0) + ' hPa ' + (druckKlasse(w) || '') : null, w.windDir ? 'Wind ' + w.windDir : null].filter(Boolean).join(' · ') : null);
-const zeitText = e => datumKurz(new Date(e.ts)) + ' · ' + e.time.slice(11);
-async function fangVonFisch(f) { return (await entries.list()).filter(e => e.fishId === f.id && e.type === 'fang').sort((a, b) => a.ts - b.ts); }
-const fischName = (f, i) => f.name || 'Ohne Namen' + (i != null ? ' ' + (i + 1) : '');
+export const wetterZeile = w => (w ? [isNum(w.tempC) ? zahl(w.tempC) + ' °C' : null, isNum(w.pressureHpa) ? zahl(w.pressureHpa, 0) + ' hPa ' + (druckKlasse(w) || '') : null, w.windDir ? 'Wind ' + w.windDir : null].filter(Boolean).join(' · ') : null);
+export const zeitText = e => datumKurz(new Date(e.ts)) + ' · ' + e.time.slice(11);
+export async function fangVonFisch(f) { return (await entries.list()).filter(e => e.fishId === f.id && e.type === 'fang').sort((a, b) => a.ts - b.ts); }
+export const fischName = (f, i) => f.name || 'Ohne Namen' + (i != null ? ' ' + (i + 1) : '');
 
 /** Kandidaten für einen Wiederfang: gleiche Art, gleiches Gewässer, mit Foto. */
-async function kandidaten(e) {
+export async function kandidaten(e) {
   const alle = (await fish.list()).filter(f => f.lakeId === e.lakeId && f.species === e.species);
   const out = [];
   for (const f of alle) {

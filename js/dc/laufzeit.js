@@ -159,6 +159,8 @@ export function einhaengen(root, vorlageKnoten, Logik, props) {
   inst.__mounted = true;
   aktuell = inst;
   if (inst.componentDidMount) inst.componentDidMount();
+  // Meldung von der vorigen Seite („Gespeichert“ …) auf der neuen Seite zeigen
+  try { const t = sessionStorage.getItem('krisiu-toast'); if (t && inst.zeige) { sessionStorage.removeItem('krisiu-toast'); inst.zeige(t); } } catch (e) { /* ohne Speicher */ }
   return inst;
 }
 export function abhaengen() {

@@ -14,7 +14,8 @@ export async function registerServiceWorker() {
     console.error('Service Worker ließ sich nicht anmelden', err);
     return null;
   }
-  const announce = () => { if (registration.waiting && navigator.serviceWorker.controller) emit('pwa', { updateReady: true }); };
+  if (!registration) return null;
+  const announce = () => { if (registration && registration.waiting && navigator.serviceWorker.controller) emit('pwa', { updateReady: true }); };
   announce();
   registration.addEventListener('updatefound', () => {
     const fresh = registration.installing;

@@ -43,9 +43,12 @@ export async function fangSpeichern({ ohneAngaben = false } = {}) {
   if (!e) return;
   if (f.foto) {
     await sicher(() => savePhoto(e.id, f.foto));
-    // Jeder Fisch mit Foto bekommt einen Steckbrief (Wiederfang ordnet man später auf der Fangkarte zu).
-    const fi = await sicher(() => fish.save({ lakeId: e.lakeId, species: e.species }));
-    if (fi) await sicher(() => entries.save({ id: e.id, fishId: fi.id }));
+    // Erster Fisch dieser Art mit Foto bekommt gleich einen Steckbrief; sonst fragt „Meine Fänge“: Kennst du den?
+    const { kandidaten } = await import('../ui/fische.js');
+    if (!(await kandidaten(e)).length) {
+      const fi = await sicher(() => fish.save({ lakeId: e.lakeId, species: e.species }));
+      if (fi) await sicher(() => entries.save({ id: e.id, fishId: fi.id }));
+    }
   }
   offen = null;
   syncWeather();

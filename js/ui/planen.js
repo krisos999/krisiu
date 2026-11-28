@@ -137,7 +137,7 @@ route('planergebnis', async param => {
 });
 
 /* ---------- Ein Tag im Detail ---------- */
-function platzTipp(lake, t, b) {
+export function platzTipp(lake, t, b) {
   const tipps = lake.tipps || null;
   if (!tipps) return 'Für dieses Gewässer habe ich noch keine Platz-Regeln. Die kommen mit deiner Startdatei oder sobald genug Fänge da sind.';
   const teile = [];

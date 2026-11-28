@@ -131,6 +131,11 @@ export const maps = makeRepo('maps', 'm', async map => {
   map.geo = g && ['lon0', 'lat0', 'dlon', 'dlat'].every(k => isNum(g[k])) && g.dlon > 0 && g.dlat > 0 ? { lon0: g.lon0, lat0: g.lat0, dlon: g.dlon, dlat: g.dlat } : null;
   map.platz = punkt(map.platz, true);
   map.source = text(map.source); map.legend = text(map.legend); map.geoNote = text(map.geoNote);
+  // Zusatz-Schichten aus der Startdatei (Tiefe, Grund): Bild + Lage in Kartenmetern
+  const L = map.layers && typeof map.layers === 'object' ? map.layers : {};
+  const schicht = x => (x && typeof x.image === 'string' && /^data:image\/(png|webp);base64,/.test(x.image) && ['x', 'y', 'w', 'h'].every(k => isNum(x[k])) && x.w > 0 && x.h > 0
+    ? { image: x.image, x: x.x, y: x.y, w: x.w, h: x.h, von: text(x.von), bis: text(x.bis) } : null);
+  map.layers = { tiefe: schicht(L.tiefe), grund: schicht(L.grund), quelle: text(L.quelle) };
   delete map.labels;
   return map;
 });

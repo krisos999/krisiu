@@ -8,11 +8,12 @@ import { go, uhrzeit, datumLang } from '../ui/app.js';
 import { laufenderAnsitz, beendeteAnsitze, zahlen, krisiuLage } from '../ui/daten.js';
 import { krisiuFrage } from '../ui/planen.js';
 import { ansitzStarten } from './gemeinsam.js';
+import { istKarpfen } from '../ui/analyse.js';
 
 /** „14 Karpfen“ – die App ist eine Karpfen-App; andere Arten nur, wenn sie eingetragen sind. */
 export function fischText(z) {
-  const n = z.fische, arten = new Set(z.eintraege.filter(e => e.type === 'fang').map(e => e.species));
-  if (arten.size <= 1 && (!arten.size || arten.has('Karpfen'))) return n + ' Karpfen';
+  const n = z.fische, arten = z.eintraege.filter(e => e.type === 'fang').map(e => e.species);
+  if (arten.every(istKarpfen)) return n + ' Karpfen';
   return n + (n === 1 ? ' Fisch' : ' Fische');
 }
 function zeitraum(s) {
